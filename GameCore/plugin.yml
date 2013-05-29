@@ -1,0 +1,31 @@
+name: GameCore
+main: net.malfact.gamecore.GameCore
+version: 1.0
+commands:
+    gc:
+        description: GameCore menu
+        usage: /gc <args>
+permissions:
+    gamecore.*:
+        description: Gives access to all iWarpPad abilities.
+        children:
+            gamecore.tool.netherstar: true
+            gamecore.tool.netherstar.bypasscooldown: true
+            gamecore.spawn.weapon: true
+            gamecore.spawn.armor: true
+            gamecore.util.reloadconfig: true
+    gamecore.tool.netherstar:
+        description: Allows use of nether star recall.
+        default: op
+    gamecore.tool.netherstar.bypasscooldown:
+        description: Allows the bypass of nether star recall cooldown.
+        default: op
+    gamecore.spawn.weapon:
+        description: Allows spawning of weapons.
+        default: op
+    gamecore.spawn.armor:
+        description: Allows spawning of armor.
+        default: op
+    gamecore.util.reloadconfig:
+        description: Allows reloading of config.
+        default: op

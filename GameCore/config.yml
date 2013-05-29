@@ -1,0 +1,4 @@
+#GameCore config.yml
+tools:
+    netherstar:
+        cooldown: 5
