@@ -1,6 +1,6 @@
 package net.malfact.gamecore.loot;
 
-import net.malfact.gamecore.GameCore.Rarity;
+import net.malfact.gamecore.lib.Rarity;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;

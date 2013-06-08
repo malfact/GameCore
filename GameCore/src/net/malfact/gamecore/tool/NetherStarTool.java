@@ -53,7 +53,7 @@ public class NetherStarTool extends Tool{
 			
 			List<String> lore= new ArrayList<String>();
 			{
-				lore.add("§cRight Click to return to this recall point!");
+				lore.add("§aRight Click to return to this recall point!");
 				lore.add(player.getWorld().getName() + ";" + player.getLocation().getBlockX() + ";" + player.getLocation().getBlockY() + ";" + player.getLocation().getBlockZ());
 				lore.add("§5Last Use: " + 0);
 			}

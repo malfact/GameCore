@@ -1,10 +1,11 @@
 package net.malfact.gamecore.loot;
 
 import java.util.ArrayList;
-import net.malfact.gamecore.GameCore.Rarity;
 import net.malfact.gamecore.GameCore.Type;
 import net.malfact.gamecore.GameCore.epic;
 import net.malfact.gamecore.GameCore.legendary;
+import net.malfact.gamecore.lib.Rarity;
+
 import org.bukkit.Material;
 
 public class Item {

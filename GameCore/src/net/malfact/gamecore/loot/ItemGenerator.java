@@ -3,6 +3,7 @@ package net.malfact.gamecore.loot;
 import java.util.ArrayList;
 import java.util.List;
 import net.malfact.gamecore.GameCore.*;
+import net.malfact.gamecore.lib.Rarity;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

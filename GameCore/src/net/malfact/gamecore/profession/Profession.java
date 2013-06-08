@@ -1,22 +1,22 @@
 package net.malfact.gamecore.profession;
 
-import java.util.ArrayList;
-
-import net.malfact.gamecore.recipe.Recipe;
-
 public class Profession {
 	
-	public ArrayList<Recipe> recipes = new ArrayList<Recipe>();
+	public static final Profession mining = new Profession(1, "Mining");
 	
-	public void addRecipe(Recipe recipe){
-		recipes.add(recipe);
+	private String name;
+	private int id;
+	
+	public Profession(int id, String name) {
+		this.id = id;
+		this.name = name;
 	}
 	
-	public Recipe getRecipe(String name){
-		for (Recipe recipe : recipes){
-			if (recipe.getName().equalsIgnoreCase(name))
-				return recipe;
-		}
-		return null;
+	public String getName(){
+		return name;
+	}
+	
+	public int getId(){
+		return id;
 	}
 }
