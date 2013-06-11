@@ -21,7 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class GameCore extends JavaPlugin {
 	//trinque test commit
-	//malfact test commit
+	//malfact test commit - HEY TRINQUE
 	
 	private static CommandMap cmap;
 	
