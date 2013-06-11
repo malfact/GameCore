@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class GameCore extends JavaPlugin {
+	//trinque test commit
 	
 	private static CommandMap cmap;
 	
