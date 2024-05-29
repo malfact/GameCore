@@ -5,6 +5,7 @@ import net.malfact.gamecore.util.DataHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -79,6 +80,9 @@ public class GamePlayer implements DataHolder<PlayerData> {
      * @param location the location to teleport the player to
      */
     public void teleport(Location location) {
+        if (location == null)
+            return;
+
         if (!isOnline()) {
             teleportLocation = location;
         } else
@@ -111,7 +115,7 @@ public class GamePlayer implements DataHolder<PlayerData> {
         String lastQueue = this.queue;
         this.queue = queue;
 
-        if (GameCore.tagPlayers && handle() != null) {
+        if (GameCore.tagPlayers) {
             if (!lastQueue.isEmpty())
                 handle().removeScoreboardTag(GameCore.queuePrefix + lastQueue);
 
