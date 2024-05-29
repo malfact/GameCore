@@ -50,6 +50,8 @@ public class GameCoreExpansion extends PlaceholderExpansion {
                 return "3";
             case "game_active":
                 return "4";
+            default:
+                return "";
         }
     }
 }
