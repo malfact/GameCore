@@ -23,16 +23,6 @@ public final class GameCore extends JavaPlugin {
     private TeamManager teamManager;
     private PlayerManager playerManager;
 
-    public static void ReloadConfig() {
-        if (instance == null)
-            return;
-
-        instance.logInfo("Reloading \"config.yml\"");
-        instance.reloadConfig();
-        FileConfiguration config = instance.getConfig();
-        tagPlayers = config.getBoolean("tag-players");
-    }
-
     @Override
     public void onEnable() {
         instance = this;
@@ -67,6 +57,16 @@ public final class GameCore extends JavaPlugin {
 
     public void logInfo(String message) {
         logger.info(Component.text(message));
+    }
+
+    public static void ReloadConfig() {
+        if (instance == null)
+            return;
+
+        instance.logInfo("Reloading \"config.yml\"");
+        instance.reloadConfig();
+        FileConfiguration config = instance.getConfig();
+        tagPlayers = config.getBoolean("tag-players");
     }
 
     public static QueueManager getQueueManager() {
