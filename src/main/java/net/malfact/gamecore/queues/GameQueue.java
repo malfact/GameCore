@@ -112,6 +112,8 @@ public class GameQueue implements DataHolder<QueueData> {
         while (iterator.hasNext()) {
             GamePlayer gamePlayer = iterator.next();
 
+            gamePlayer.setQueue("");
+
             if (gamePlayer.exists())
                 gamePlayer.handle().addScoreboardTag(tag);
 
@@ -120,13 +122,12 @@ public class GameQueue implements DataHolder<QueueData> {
     }
 
     public void popWithTeam(@NotNull GameTeam team) {
-        if (players.isEmpty())
-            return;
-
         Iterator<GamePlayer> iterator = players.iterator();
 
         while (iterator.hasNext()) {
-            team.addPlayer(iterator.next());
+            GamePlayer player = iterator.next();
+            team.addPlayer(player);
+            player.setQueue("");
             iterator.remove();
         }
     }
