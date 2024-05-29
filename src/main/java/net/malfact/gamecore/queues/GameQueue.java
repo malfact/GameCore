@@ -14,15 +14,17 @@ public class GameQueue implements DataHolder<QueueData> {
 
     private boolean enabled = false;
 
-    private List<GamePlayer> players;
+    private final List<GamePlayer> players;
 
 
     GameQueue(String name) {
         this.name = name;
+
+        players = new ArrayList<>();
     }
 
     void clean() {
-        if (players == null || players.isEmpty())
+        if (players.isEmpty())
             return;
 
         Iterator<GamePlayer> it = players.iterator();
@@ -69,9 +71,6 @@ public class GameQueue implements DataHolder<QueueData> {
      * @return <i>true</i> if the player was added successfully, <i>false</i> otherwise
      */
     public boolean addPlayer(GamePlayer player) {
-        if (players == null)
-            players = new ArrayList<>();
-
         if (players.contains(player) || !enabled)
             return false;
 
@@ -97,7 +96,7 @@ public class GameQueue implements DataHolder<QueueData> {
      * @return <i>true</i> if the player was removed successfully, false otherwise
      */
     public boolean removePlayer(GamePlayer player) {
-        if (players == null || !players.contains(player))
+        if (!players.contains(player))
             return false;
 
         players.remove(player);
@@ -121,7 +120,7 @@ public class GameQueue implements DataHolder<QueueData> {
     }
 
     public void popWithTeam(@NotNull GameTeam team) {
-        if (players == null || players.isEmpty())
+        if (players.isEmpty())
             return;
 
         Iterator<GamePlayer> iterator = players.iterator();
