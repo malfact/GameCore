@@ -31,6 +31,8 @@ public class GameTeam implements DataHolder<TeamData> {
         this.teamManager = teamManager;
         this.name = name;
 
+        refreshHandle();
+
         players = new ArrayList<>();
     }
 
@@ -63,12 +65,14 @@ public class GameTeam implements DataHolder<TeamData> {
         handleTime = Instant.now();
     }
 
+
+
     /**
      * Get the underling minecraft scoreboard Team of this GameTeam
      * @return the minecraft scoreboard Team
      */
     public Team handle() {
-        if (handle == null || handleTime == null)
+        if (handle == null || handleTime == null || handle.getScoreboard() == null)
             refreshHandle();
 
         if (ChronoUnit.SECONDS.between(Instant.now(), handleTime) >= 30)
