@@ -49,6 +49,37 @@ public class GameTeamCommand {
                         context.getSource().getSender().sendMessage(component);
                         return Command.SINGLE_SUCCESS;
                     })
+                    .then(Commands.argument("team",StringArgumentType.word())
+                        .suggests(SuggestionProviders.TEAMS)
+                        .executes(context -> {
+                            String team = StringArgumentType.getString(context, "team");
+                            GameTeam gameTeam = GameCore.getTeamManager().getTeam(team);
+
+                            CommandSender sender = context.getSource().getSender();
+
+                            if (gameTeam == null) {
+                                sender.sendMessage(Messages.deserialize(Messages.ERROR_UNKNOWN_TEAM, "team", team));
+                                return 0;
+                            }
+
+                            Set<GamePlayer> players = gameTeam.getPlayers();
+                            String[] names = new String[players.size()];
+
+                            int i = 0;
+                            for (GamePlayer player : players) {
+                                names[i] = player.handle().getName();
+                                i++;
+                            }
+
+                            sender.sendMessage(Messages.deserialize(
+                                "Team [<team>] members: <gray><green>" +
+                                    String.join("</green>, <green>", names),
+                                "team", team
+                            ));
+
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
                 )
 
                 .then(Commands.literal("add")
