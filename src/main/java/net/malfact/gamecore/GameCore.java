@@ -2,10 +2,12 @@ package net.malfact.gamecore;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import net.malfact.gamecore.placeholder.GameCoreExpansion;
 import net.malfact.gamecore.players.PlayerListener;
 import net.malfact.gamecore.players.PlayerManager;
 import net.malfact.gamecore.queues.QueueManager;
 import net.malfact.gamecore.teams.TeamManager;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -43,6 +45,11 @@ public final class GameCore extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
         logInfo("Registered Event Handlers");
+
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            logInfo("PlaceholderAPI is enabled, registering Expansion.");
+            new GameCoreExpansion(this).register();
+        }
     }
 
     @Override
