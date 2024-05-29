@@ -47,6 +47,8 @@ public class Messages {
     public static final String INFO_TEAM_TP_RESET = "Teleport location for team [<team>] has been reset";
     public static final String INFO_TEAM_TP_HERE = "Teleport location for team [<team>] has been set to location";
 
+    public static final String INFO_RELOAD_CONFIG = "Reloading GameCore 'config.yml'";
+
     public static Component deserialize(final String message) {
         return MiniMessage.miniMessage().deserialize(message);
     }
