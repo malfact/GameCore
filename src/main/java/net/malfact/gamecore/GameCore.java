@@ -14,12 +14,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class GameCore extends JavaPlugin {
 
-    public static String queuePrefix = "gamecore.queue.";
+    public static final String queuePrefix = "gamecore.queue.";
     public static boolean tagPlayers = true;
 
     private static GameCore instance;
 
     private ComponentLogger logger;
+    private Messages messages;
 
     private QueueManager queueManager;
     private TeamManager teamManager;
@@ -30,14 +31,19 @@ public final class GameCore extends JavaPlugin {
         instance = this;
         this.logger = getComponentLogger();
 
-        queueManager = new QueueManager(this);
-        teamManager = new TeamManager(this);
-        playerManager = new PlayerManager(this);
-
         saveDefaultConfig();
         FileConfiguration config = getConfig();
         tagPlayers = config.getBoolean("queues.tag-players");
         logInfo("Loaded 'config.yml'");
+
+        messages = new Messages(this);
+        messages.saveDefaultMessages();
+        messages.reloadMessages();
+        logInfo("Loaded 'messages.yml'");
+
+        queueManager = new QueueManager(this);
+        teamManager = new TeamManager(this);
+        playerManager = new PlayerManager(this);
 
         queueManager.load();
         teamManager.load();
@@ -70,10 +76,19 @@ public final class GameCore extends JavaPlugin {
         if (instance == null)
             return;
 
-        instance.logInfo("Reloading \"config.yml\"");
+        instance.logInfo("Reloading 'config.yml'");
         instance.reloadConfig();
         FileConfiguration config = instance.getConfig();
         tagPlayers = config.getBoolean("tag-players");
+        instance.logInfo("Reloaded 'config.yml'");
+
+        instance.logInfo("Reloading 'messages.yml");
+        instance.messages.reloadMessages();
+        instance.logInfo("Reloaded 'messages.yml'");
+    }
+
+    public static Messages getMessages() {
+        return instance.messages;
     }
 
     public static QueueManager getQueueManager() {
