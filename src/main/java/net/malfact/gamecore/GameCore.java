@@ -2,6 +2,7 @@ package net.malfact.gamecore;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import net.malfact.gamecore.commands.GameCoreCommands;
 import net.malfact.gamecore.placeholder.GameCoreExpansion;
 import net.malfact.gamecore.players.PlayerListener;
 import net.malfact.gamecore.players.PlayerManager;
@@ -25,6 +26,11 @@ public final class GameCore extends JavaPlugin {
     private QueueManager queueManager;
     private TeamManager teamManager;
     private PlayerManager playerManager;
+
+    @Override
+    public void onLoad() {
+        GameCoreCommands.register(this);
+    }
 
     @Override
     public void onEnable() {

@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.GameManager;
 import net.malfact.gamecore.util.Json;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -20,7 +21,7 @@ public class QueueManager extends GameManager {
      * @return the Queue that was created,
      * <i>null</i> if a queue by that name already exists or the name is invalid.
      */
-    public GameQueue create(String name) {
+    public GameQueue addQueue(String name) {
         if (name == null || name.isEmpty() || QUEUES.containsKey(name))
             return null;
 
@@ -33,19 +34,16 @@ public class QueueManager extends GameManager {
     /**
      * Deletes a Queue by its name
      * @param name the name of the Queue
-     * @return <i>true</i> if the Queue was deleted, <i>false</i> otherwise
      */
-    public boolean remove(String name) {
-        if (name == null || name.isEmpty())
-            return false;
+    public void removeQueue(@NotNull String name) {
+        if (name.isEmpty())
+            return;
 
         GameQueue deleted = QUEUES.remove(name);
 
         // Safely cleans up deleted queues
         if (deleted != null)
-            deleted.clean();
-
-        return deleted != null;
+            deleted.empty();
     }
 
     /**
@@ -82,12 +80,13 @@ public class QueueManager extends GameManager {
         return QUEUES.keySet().toArray(new String[0]);
     }
 
+
     /**
      * Cleans all registered Queues in preparation for shutdown
      */
     public void clean() {
         for (GameQueue queue : QUEUES.values()) {
-            queue.clean();
+            queue.empty();
         }
     }
 

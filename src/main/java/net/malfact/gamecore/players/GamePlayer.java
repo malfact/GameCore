@@ -1,19 +1,20 @@
 package net.malfact.gamecore.players;
 
 import net.malfact.gamecore.GameCore;
+import net.malfact.gamecore.teams.GameTeam;
 import net.malfact.gamecore.util.DataHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 public class GamePlayer implements DataHolder<PlayerData> {
     public final UUID uuid;
-    private final String name;
+    private String name;
     private Player handle;
     private Instant handleTime;
 
@@ -29,7 +30,7 @@ public class GamePlayer implements DataHolder<PlayerData> {
 
     GamePlayer(Player player, PlayerData data) {
         this(player);
-        teleportLocation = player.getLocation();
+        teleportLocation = data.teleportLocation;
     }
 
     void refreshHandle() {
@@ -62,6 +63,13 @@ public class GamePlayer implements DataHolder<PlayerData> {
         return exists() && this.handle().isOnline();
     }
 
+    /**
+     * {@return <i>true</i> if the GamePlayer is dead, otherwise <i>false</i>}
+     */
+    public boolean isDead() {
+        return this.handle().isDead();
+    }
+
     public boolean exists() {
         Player player = this.handle();
         return player != null;
@@ -80,12 +88,24 @@ public class GamePlayer implements DataHolder<PlayerData> {
      * @param location the location to teleport the player to
      */
     public void teleport(Location location) {
+        teleport(location, false);
+    }
+
+    /**
+     * Teleports this Player to the provided location. <br>
+     * If whenTeleportReady is set and the player is dead or offline, the location
+     * will be saved and the player will be teleported when it is possible.
+     * @param location The location to teleport the player to
+     * @param whenTeleportReady If <i>true</i>, then the location will be saved until
+     *                          the player can be teleported
+     */
+    public void teleport(Location location, boolean whenTeleportReady) {
         if (location == null)
             return;
 
-        if (!isOnline()) {
+        if (whenTeleportReady && (isDead() || !isOnline()))
             teleportLocation = location;
-        } else
+        else
             handle().teleport(location);
     }
 
@@ -104,11 +124,11 @@ public class GamePlayer implements DataHolder<PlayerData> {
     /**
      * Sets the current queue name for this GamePlayer and notifies them.
      * Does not physically change their queues.
-     * @see net.malfact.gamecore.queues.GameQueue#addPlayer(GamePlayer)  GameQueue.addPlayer(GamePlayer)
+     *
      * @param queue the name of the queue
-     * @return the name of the previous queue
+     * @see net.malfact.gamecore.queues.GameQueue#addPlayer(GamePlayer)  GameQueue.addPlayer(GamePlayer)
      */
-    public String setQueue(String queue) {
+    public void setQueue(String queue) {
         if (queue == null)
             queue = "";
 
@@ -123,7 +143,10 @@ public class GamePlayer implements DataHolder<PlayerData> {
                 handle().addScoreboardTag(GameCore.queuePrefix + queue);
         }
 
-        return lastQueue;
+    }
+
+    public @Nullable GameTeam getTeam() {
+        return GameCore.getTeamManager().getTeam(this);
     }
 
     @Override

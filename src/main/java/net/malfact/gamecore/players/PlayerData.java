@@ -5,12 +5,13 @@ import org.bukkit.Location;
 import java.time.Instant;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public class PlayerData {
 
-    public UUID uuid;
-    public String name;
-    public Location teleportLocation;
-    public String time;
+    public final UUID uuid;
+    public final String name;
+    public final Location teleportLocation;
+    public final String time;
 
     public PlayerData(UUID uuid, String name, Location teleportLocation) {
         this.uuid = uuid;

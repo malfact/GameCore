@@ -38,25 +38,23 @@ public class TeamManager extends GameManager {
 
     /**
      * Deletes a Team by its name
+     *
      * @param name the name of the Team
-     * @return <i>true</i> if the team what deleted,
-     * <i>false</i> otherwise
      */
-    public boolean removeTeam(String name) {
+    public void removeTeam(String name) {
         if (name == null || name.isEmpty())
-            return false;
+            return;
 
         GameTeam deleted = TEAMS.remove(name);
 
         if (deleted != null)
             deleted.clean();
 
-        return deleted != null;
     }
 
     /**
      * Gets a Team by its name
-     * @param name
+     * @param name the name to find
      * @return the Team, otherwise <i>null</i>
      */
     public GameTeam getTeam(String name) {

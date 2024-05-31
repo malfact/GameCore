@@ -1,7 +1,5 @@
 package net.malfact.gamecore;
 
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
-
 public abstract class GameManager {
 
     protected final GameCore plugin;

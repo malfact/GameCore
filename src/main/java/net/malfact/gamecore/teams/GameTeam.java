@@ -1,10 +1,11 @@
 package net.malfact.gamecore.teams;
 
+import net.malfact.gamecore.event.PlayerJoinTeamEvent;
+import net.malfact.gamecore.event.PlayerLeaveTeamEvent;
 import net.malfact.gamecore.players.GamePlayer;
 import net.malfact.gamecore.util.DataHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +27,7 @@ public class GameTeam implements DataHolder<TeamData> {
 
     private Location spawn;
     private Location exit;
+    private boolean leaveOnDeath;
 
     GameTeam(final String name, final TeamManager teamManager) {
         this.teamManager = teamManager;
@@ -39,8 +41,7 @@ public class GameTeam implements DataHolder<TeamData> {
     GameTeam(final TeamData data, final TeamManager teamManager) {
         this(data.name, teamManager);
 
-        this.spawn = data.spawn;
-        this.exit = data.exit;
+        this.setDataObject(data);
     }
 
     void clean() {
@@ -91,12 +92,12 @@ public class GameTeam implements DataHolder<TeamData> {
 
     /**
      * Adds a GamePlayer to the Team
+     *
      * @param player the GamePlayer to add
-     * @return <i>true</i> if the player was added successfully, false otherwise
      */
-    public boolean addPlayer(@NotNull GamePlayer player) {
+    public void addPlayer(@NotNull GamePlayer player) {
         if (players.contains(player))
-            return false;
+            return;
 
         String oldTeam = teamManager.getPlayerTeam(player.uuid);
         if (oldTeam != null) {
@@ -105,34 +106,13 @@ public class GameTeam implements DataHolder<TeamData> {
         teamManager.setPlayerTeam(player.uuid, this.name);
 
         players.add(player);
+        new PlayerJoinTeamEvent(player, this).callEvent();
 
         handle().addPlayer(player.handle());
-
-        if (spawn != null)
-            player.teleport(spawn);
-
-        return true;
     }
 
-    public void addPlayers(@NotNull List<GamePlayer> gamePlayers) {
-        List<Player> players = gamePlayers.stream().map(GamePlayer::handle).toList();
-        handle().addEntities(new HashSet<>(players));
 
-        for (GamePlayer gamePlayer : gamePlayers) {
-            this.players.add(gamePlayer);
-
-            String oldTeam = teamManager.getPlayerTeam(gamePlayer.uuid);
-            if (oldTeam != null) {
-                teamManager.getTeam(oldTeam).silentRemovePlayer(gamePlayer);
-            }
-            teamManager.setPlayerTeam(gamePlayer.uuid, this.name);
-
-            if (spawn != null)
-                gamePlayer.teleport(spawn);
-        }
-    }
-
-    private void silentRemovePlayer(@NotNull GamePlayer player) {
+    public void silentRemovePlayer(@NotNull GamePlayer player) {
         try {
             handle().removePlayer(player.handle());
         } catch (IllegalStateException ignored) {}
@@ -140,57 +120,24 @@ public class GameTeam implements DataHolder<TeamData> {
         players.remove(player);
     }
 
-    private void silentRemovePlayers(@NotNull List<GamePlayer> players) {
-        List<Player> playerList = players.stream().map(GamePlayer::handle).toList();
-
-        try {
-            handle().removeEntities(new HashSet<>(playerList));
-        } catch (IllegalStateException ignored) {}
-
-        for (GamePlayer gamePlayer : players) {
-            this.players.remove(gamePlayer);
-        }
-    }
 
     /**
      * Removes a GamePlayer from the Team
      * @param player the GamePlayer to remove
-     * @return <i>true</i> if the player was removed successfully, false otherwise
      */
-    public boolean removePlayer(@NotNull GamePlayer player) {
+    public void removePlayer(@NotNull GamePlayer player) {
         if (players.isEmpty() || !players.contains(player))
-            return false;
+            return;
 
         teamManager.setPlayerTeam(player.uuid, null);
+
+        new PlayerLeaveTeamEvent(player, this).callEvent();
 
         try {
             handle().removePlayer(player.handle());
         } catch (IllegalStateException ignored) {}
 
         players.remove(player);
-        if (exit != null)
-            player.teleport(exit);
-
-        return true;
-    }
-
-    public void removePlayers(@NotNull List<GamePlayer> gamePlayers) {
-        List<Player> players = gamePlayers.stream().map(GamePlayer::handle).toList();
-
-        try {
-            handle().removeEntities(new HashSet<>(players));
-        } catch (IllegalStateException ignored) {}
-
-        for (GamePlayer gamePlayer : gamePlayers) {
-            if (!this.players.contains(gamePlayer))
-                continue;
-
-            teamManager.setPlayerTeam(gamePlayer.uuid, null);
-
-            this.players.remove(gamePlayer);
-            if (exit != null)
-                gamePlayer.teleport(exit);
-        }
     }
 
     public void empty() {
@@ -205,10 +152,30 @@ public class GameTeam implements DataHolder<TeamData> {
         while (iterator.hasNext()) {
             GamePlayer p = iterator.next();
             teamManager.setPlayerTeam(p.uuid, null);
-            p.teleport(exit);
+            new PlayerLeaveTeamEvent(p, this).callEvent();
 
             iterator.remove();
         }
+    }
+
+    public boolean isEmpty() {
+        return players.isEmpty();
+    }
+
+    public int getPlayerCount() {
+        return players.size();
+    }
+
+    /**
+     * Gets if the Team contains a player
+     * @param player the player to check for
+     * @return <i>true</i> if player is in team, <i>false</i> otherwise
+     */
+    public boolean hasPlayer(GamePlayer player) {
+        if (players.isEmpty())
+            return false;
+
+        return players.contains(player);
     }
 
     /**
@@ -220,6 +187,14 @@ public class GameTeam implements DataHolder<TeamData> {
     }
 
     /**
+     * Set the spawn location for this Team
+     * @param location the location to set spawn to
+     */
+    public void setSpawn(Location location) {
+        this.spawn = location == null ? null : location.clone();
+    }
+
+    /**
      * Get the exit location for this Team
      * @return the exit location
      */
@@ -228,21 +203,26 @@ public class GameTeam implements DataHolder<TeamData> {
     }
 
     /**
-     * Set the spawn location for this Team
-     * @param location the location to set spawn to
-     */
-    public void setSpawn(Location location) {
-        System.out.println("SETTING SPAWN " + location);
-        this.spawn = location == null ? null : location.clone();
-    }
-
-    /**
      * Set the exit location for this Team
      * @param location the location to set exit to
      */
     public void setExit(Location location) {
-        System.out.println("SETTING EXIT" + location);
         this.exit = location == null ? null : location.clone();
+    }
+
+    /**
+     * {@return <i>true<i> if players should leave the Team on death, otherwise <i>false</i>}
+     */
+    public boolean getLeaveOnDeath() {
+        return this.leaveOnDeath;
+    }
+
+    /**
+     * Sets if players should leave the Team on death
+     * @param value should players leave the team on death
+     */
+    public void setLeaveOnDeath(boolean value) {
+        this.leaveOnDeath = value;
     }
 
     @Override
@@ -259,12 +239,13 @@ public class GameTeam implements DataHolder<TeamData> {
 
     @Override
     public TeamData getDataObject() {
-        return new TeamData(name, spawn, exit);
+        return new TeamData(name, spawn, exit, leaveOnDeath);
     }
 
     @Override
     public void setDataObject(TeamData data) {
         this.spawn = data.spawn;
         this.exit = data.exit;
+        this.leaveOnDeath = data.leaveOnDeath;
     }
 }

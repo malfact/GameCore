@@ -2,9 +2,11 @@ name: GameCore
 version: ${version}
 main: net.malfact.gamecore.GameCore
 api-version: '1.20'
-bootstrapper: net.malfact.gamecore.GameCoreBootstrap
 dependencies:
   server:
+    CommandAPI:
+      load: BEFORE
+      required: true
     PlaceholderAPI:
       load: BEFORE
       required: false
@@ -12,8 +14,15 @@ permissions:
   gamecore.*:
     default: op
     children:
-      gamecore.queue.*: true
-      gamecore.team.*: true
+      gamecore.admin.*: true
+      gamecore.player.*: true
+  gamecore.admin:
+    default: false
+    children:
+      gamecore.reload: true
+      gamecore.save: true
+      gamecore.queue.admin: true
+      gamecore.team.admin: true
   gamecore.player:
     default: false
     children:
@@ -27,8 +36,8 @@ permissions:
   gamecore.queue.admin:
     default: false
     children:
-      gamecore.queue.create: true
-      gamecore.queue.delete: true
+      gamecore.queue.add: true
+      gamecore.queue.remove: true
       gamecore.queue.join.other: true
       gamecore.queue.leave.other: true
       gamecore.queue.list: true
@@ -46,8 +55,8 @@ permissions:
   gamecore.team.admin:
     default: false
     children:
-      gamecore.team.create: true
-      gamecore.team.delete: true
+      gamecore.team.add: true
+      gamecore.team.remove: true
       gamecore.team.join.other: true
       gamecore.team.leave.other: true
       gamecore.team.list: true

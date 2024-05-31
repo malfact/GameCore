@@ -3,13 +3,15 @@ package net.malfact.gamecore.teams;
 import org.bukkit.Location;
 
 public class TeamData {
-    public String name;
-    public Location spawn;
-    public Location exit;
+    public final String name;
+    public final Location spawn;
+    public final Location exit;
+    public final boolean leaveOnDeath;
 
-    public TeamData(String name, Location spawn, Location exit) {
+    public TeamData(String name, Location spawn, Location exit, boolean leaveOnDeath) {
         this.name = name;
         this.spawn = spawn;
         this.exit = exit;
+        this.leaveOnDeath = leaveOnDeath;
     }
 }

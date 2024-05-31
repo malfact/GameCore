@@ -4,7 +4,7 @@ import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.players.GamePlayer;
 import net.malfact.gamecore.teams.GameTeam;
 import net.malfact.gamecore.util.DataHolder;
-import net.malfact.gamecore.util.Messages;
+import net.malfact.gamecore.Messages;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -23,21 +23,6 @@ public class GameQueue implements DataHolder<QueueData> {
         players = new ArrayList<>();
     }
 
-    void clean() {
-        if (players.isEmpty())
-            return;
-
-        Iterator<GamePlayer> it = players.iterator();
-        while (it.hasNext()) {
-            GamePlayer player = it.next();
-
-            player.setQueue("");
-            player.handle().sendMessage(Messages.deserialize(Messages.INFO_LEFT_QUEUE, "queue", this.name));
-
-            it.remove();
-        }
-    }
-
     /**
      * Set the enabled status of this Queue
      * @param enabled enabled status
@@ -46,7 +31,7 @@ public class GameQueue implements DataHolder<QueueData> {
         this.enabled = enabled;
 
         if (!enabled)
-            clean();
+            empty();
     }
 
     /**
@@ -67,12 +52,12 @@ public class GameQueue implements DataHolder<QueueData> {
 
     /**
      * Adds a GamePlayer to the Queue
+     *
      * @param player the GamePlayer to add
-     * @return <i>true</i> if the player was added successfully, <i>false</i> otherwise
      */
-    public boolean addPlayer(GamePlayer player) {
+    public void addPlayer(GamePlayer player) {
         if (players.contains(player) || !enabled)
-            return false;
+            return;
 
         players.add(player);
         String oldQueue = player.getQueue();
@@ -85,25 +70,69 @@ public class GameQueue implements DataHolder<QueueData> {
 
         player.setQueue(this.name);
 
-        player.handle().sendMessage(Messages.deserialize(Messages.INFO_JOINED_QUEUE, "queue", this.name));
+        player.handle().sendMessage(Messages.get("SELF_JOIN_QUEUE",this.name));
 
-        return true;
     }
 
     /**
      * Removes a player from the Queue
+     *
      * @param player the GamePlayer to remove
-     * @return <i>true</i> if the player was removed successfully, false otherwise
      */
-    public boolean removePlayer(GamePlayer player) {
+    public void removePlayer(GamePlayer player) {
         if (!players.contains(player))
-            return false;
+            return;
 
         players.remove(player);
         player.setQueue("");
-        player.handle().sendMessage(Messages.deserialize(Messages.INFO_LEFT_QUEUE, "queue", this.name));
+        player.handle().sendMessage(Messages.get("SELF_LEFT_QUEUE",this.name));
 
-        return true;
+    }
+
+    /**
+     * Gets if a player is in the Queue
+     * @param player the player to look for
+     * @return <i>true</i> if the player is found, <i>false</i> otherwise
+     */
+    public boolean hasPlayer(GamePlayer player) {
+        if (!enabled || players.isEmpty())
+            return false;
+
+        return players.contains(player);
+    }
+
+    /**
+     * Empties the queue
+     */
+    public void empty() {
+        if (players.isEmpty())
+            return;
+
+        Iterator<GamePlayer> it = players.iterator();
+        while (it.hasNext()) {
+            GamePlayer player = it.next();
+
+            player.setQueue("");
+            player.handle().sendMessage(Messages.get("SELF_LEFT_QUEUE", this.name));
+
+            it.remove();
+        }
+    }
+
+    /**
+     * Returns if the Queue is empty
+     * @return <i>true</i> if it is empty, <i>false</i> otherwise
+     */
+    public boolean isEmpty() {
+        return players.isEmpty();
+    }
+
+    /**
+     * Returns the number of players in the Queue
+     * @return the number of players in queue
+     */
+    public int getPlayerCount() {
+        return players.size();
     }
 
     public void popWithTag(String tag) {
