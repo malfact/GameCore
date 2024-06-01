@@ -131,7 +131,6 @@ public final class PlayerManager extends GameManager implements Listener {
             // Rebind player to existing object
             gamePlayer = players.get(uuid);
             gamePlayer.bindPlayer(player);
-            gamePlayer.setOnline(true);
 
             plugin.logInfo("Using active Player Data for " + gamePlayer);
 
@@ -139,6 +138,8 @@ public final class PlayerManager extends GameManager implements Listener {
             cleaningTasks.get(uuid).cancel();
             plugin.logInfo("Canceled Data-Clean for " + gamePlayer);
         }
+
+        gamePlayer.setOnline(true);
 
         // Runs cached teleports
         if (gamePlayer.hasCachedTeleport()) {
