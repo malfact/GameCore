@@ -225,7 +225,7 @@ public class GameQueueCommand {
 
         queue.popWithTag(tag);
 
-        sender.sendMessage(Messages.get("COUNT_POPPED_QUEUE", ""+count, queue.name));
+        sender.sendMessage(Messages.get("COUNT_POPPED_QUEUE_TAG", ""+count, queue.name, tag));
         return count;
     }
 
@@ -236,7 +236,7 @@ public class GameQueueCommand {
         int count = queue.getPlayerCount();
         queue.popWithTeam(team);
 
-        sender.sendMessage(Messages.get("COUNT_POPPED_QUEUE", ""+count, queue.name));
+        sender.sendMessage(Messages.get("COUNT_POPPED_QUEUE_TEAM", ""+count, queue.name, team.name));
         return count;
     }
 }
