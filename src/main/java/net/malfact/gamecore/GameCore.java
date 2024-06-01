@@ -52,9 +52,8 @@ public final class GameCore extends JavaPlugin {
 
         queueManager.load();
         teamManager.load();
-        playerManager.load();
 
-        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        getServer().getPluginManager().registerEvents(playerManager, this);
         logInfo("Registered Event Handlers");
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
@@ -70,7 +69,6 @@ public final class GameCore extends JavaPlugin {
 
         teamManager.save();
         teamManager.clean();
-
     }
 
     public void logInfo(String message) {

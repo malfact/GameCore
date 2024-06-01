@@ -60,7 +60,7 @@ public class GameQueue implements DataHolder<QueueData> {
             return;
 
         players.add(player);
-        String oldQueue = player.getQueue();
+        String oldQueue = player.getQueueName();
 
         if (!oldQueue.isEmpty() && !oldQueue.equals(this.name)) {
             GameQueue oldGameQueue = GameCore.getQueueManager().getQueue(oldQueue);
@@ -70,7 +70,7 @@ public class GameQueue implements DataHolder<QueueData> {
 
         player.setQueue(this.name);
 
-        player.handle().sendMessage(Messages.get("SELF_JOIN_QUEUE",this.name));
+        player.sendMessage(Messages.get("SELF_JOIN_QUEUE",this.name));
 
     }
 
@@ -85,7 +85,7 @@ public class GameQueue implements DataHolder<QueueData> {
 
         players.remove(player);
         player.setQueue("");
-        player.handle().sendMessage(Messages.get("SELF_LEFT_QUEUE",this.name));
+        player.sendMessage(Messages.get("SELF_LEFT_QUEUE",this.name));
 
     }
 
@@ -113,7 +113,7 @@ public class GameQueue implements DataHolder<QueueData> {
             GamePlayer player = it.next();
 
             player.setQueue("");
-            player.handle().sendMessage(Messages.get("SELF_LEFT_QUEUE", this.name));
+            player.sendMessage(Messages.get("SELF_LEFT_QUEUE", this.name));
 
             it.remove();
         }
@@ -143,8 +143,7 @@ public class GameQueue implements DataHolder<QueueData> {
 
             gamePlayer.setQueue("");
 
-            if (gamePlayer.exists())
-                gamePlayer.handle().addScoreboardTag(tag);
+            gamePlayer.getPlayer().addScoreboardTag(tag);
 
             iterator.remove();
         }

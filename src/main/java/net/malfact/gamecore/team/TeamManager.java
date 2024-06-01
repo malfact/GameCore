@@ -67,7 +67,7 @@ public class TeamManager extends GameManager {
      * @return the Team, otherwise <i>null</i>
      */
     public GameTeam getTeam(GamePlayer player) {
-        String team = PLAYER_TEAMS.get(player.uuid);
+        String team = PLAYER_TEAMS.get(player.getUniqueId());
 
         if (team == null)
             return null;

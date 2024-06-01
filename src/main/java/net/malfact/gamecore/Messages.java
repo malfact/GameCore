@@ -10,8 +10,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
 
 public class Messages {
 
@@ -60,6 +62,14 @@ public class Messages {
             return;
 
         messages.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defMessagesStream, Charsets.UTF_8)));
+    }
+
+    public void saveMessages() {
+        try {
+            getMessagesConfig().save(messagesFile);
+        } catch (IOException exception) {
+            plugin.getLogger().log(Level.SEVERE, "Could not save Messages to " + messagesFile, exception);
+        }
     }
 
     public FileConfiguration getMessagesConfig() {

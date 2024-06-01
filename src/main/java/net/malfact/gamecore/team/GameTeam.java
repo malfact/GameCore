@@ -99,25 +99,14 @@ public class GameTeam implements DataHolder<TeamData> {
         if (players.contains(player))
             return;
 
-        String oldTeam = teamManager.getPlayerTeam(player.uuid);
+        String oldTeam = teamManager.getPlayerTeam(player.getUniqueId());
         if (oldTeam != null) {
-            teamManager.getTeam(oldTeam).silentRemovePlayer(player);
+            teamManager.getTeam(oldTeam).players.remove(player);
         }
-        teamManager.setPlayerTeam(player.uuid, this.name);
+        teamManager.setPlayerTeam(player.getUniqueId(), this.name);
 
         players.add(player);
         new PlayerJoinTeamEvent(player, this).callEvent();
-
-        handle().addPlayer(player.handle());
-    }
-
-
-    public void silentRemovePlayer(@NotNull GamePlayer player) {
-        try {
-            handle().removePlayer(player.handle());
-        } catch (IllegalStateException ignored) {}
-
-        players.remove(player);
     }
 
 
@@ -129,13 +118,9 @@ public class GameTeam implements DataHolder<TeamData> {
         if (players.isEmpty() || !players.contains(player))
             return;
 
-        teamManager.setPlayerTeam(player.uuid, null);
+        teamManager.setPlayerTeam(player.getUniqueId(), null);
 
         new PlayerLeaveTeamEvent(player, this).callEvent();
-
-        try {
-            handle().removePlayer(player.handle());
-        } catch (IllegalStateException ignored) {}
 
         players.remove(player);
     }
@@ -150,9 +135,9 @@ public class GameTeam implements DataHolder<TeamData> {
 
         Iterator<GamePlayer> iterator = players.iterator();
         while (iterator.hasNext()) {
-            GamePlayer p = iterator.next();
-            teamManager.setPlayerTeam(p.uuid, null);
-            new PlayerLeaveTeamEvent(p, this).callEvent();
+            GamePlayer player = iterator.next();
+            teamManager.setPlayerTeam(player.getUniqueId(), null);
+            new PlayerLeaveTeamEvent(player, this).callEvent();
 
             iterator.remove();
         }

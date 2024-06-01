@@ -67,3 +67,5 @@ permissions:
     children:
       gamecore.team.join: true
       gamecore.team.leave: true
+  gamecore.ignore-spawn-on-join:
+    default: false

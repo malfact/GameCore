@@ -1,2 +1,24 @@
+spawn-on-join: true
+
+# Settings on how and when data should be cleaned.
+cleaning:
+  # Player State cleaning settings
+  player-cleaning-delay:
+    # How long until the Player State is cleared
+    # When they are in a game system
+    # (e.g. queues, teams, games)
+    in-system:
+      other: 120
+      timed-out: 300
+      disconnected: 300
+      kicked: 120
+    # When they are not in a game system
+    out-system:
+      other: 120
+      timed-out: 120
+      disconnected: 60
+      kicked: 30
+
+# Settings for queues
 queues:
   tag-players: true

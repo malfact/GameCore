@@ -1,82 +1,101 @@
 package net.malfact.gamecore.player;
 
+import net.kyori.adventure.text.Component;
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.team.GameTeam;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.UUID;
 
-public class GamePlayer implements DataHolder<PlayerData> {
-    public final UUID uuid;
-    private String name;
-    private Player handle;
-    private Instant handleTime;
+public class GamePlayer {
+    private Player player;
 
     private String queue = "";
-    private Location teleportLocation = null;
+    private boolean online;
+
+    private final PlayerData playerData;
 
     GamePlayer(Player player) {
-        uuid = player.getUniqueId();
-        name = player.getName();
-        handle = player;
-        handleTime = Instant.now();
+        this(player, new PlayerData(player.getUniqueId(), player.getName()));
     }
 
     GamePlayer(Player player, PlayerData data) {
-        this(player);
-        teleportLocation = data.teleportLocation;
+        Objects.requireNonNull(player);
+        Objects.requireNonNull(data);
+
+        this.playerData = data;
+
+        bindPlayer(player);
     }
 
-    void refreshHandle() {
-        Player player = Bukkit.getPlayer(uuid);
+    void bindPlayer(@NotNull Player player) {
+        this.player = player;
+    }
 
-        if (player != null) {
-            handle = player;
-            handleTime = Instant.now();
-        }
+    PlayerData getPlayerData() {
+        return playerData;
+    }
+
+    boolean hasCachedTeleport() {
+        return playerData.teleportLocation != null;
+    }
+
+    Location getCachedTeleport() {
+        return playerData.teleportLocation.clone();
+    }
+
+    void clearCachedTeleport() {
+        this.playerData.teleportLocation = null;
+    }
+
+    void setOnline(boolean value) {
+        this.online = value;
+    }
+
+    void setDead(boolean value) {
+        this.playerData.dead = value;
+    }
+
+    boolean inSystem() {
+        return !this.getTeamName().isEmpty() || !this.getQueueName().isEmpty();
     }
 
     /**
-     * {@return The Player referenced by this GamePlayer}
+     * {@return the UUID of the player}
      */
-    public Player handle() {
-        if (ChronoUnit.SECONDS.between(Instant.now(), handleTime) >= 30)
-            refreshHandle();
-
-        return handle;
+    public UUID getUniqueId() {
+        return playerData.uuid;
     }
 
+    /**
+     * {@return the name of the player}
+     */
     public String getName() {
-        return name;
+        return playerData.name;
     }
 
     /**
      * {@return <i>true</i> if the GamePlayer is online, otherwise <i>false</i>}
      */
     public boolean isOnline() {
-        return exists() && this.handle().isOnline();
+        return online;
     }
 
     /**
      * {@return <i>true</i> if the GamePlayer is dead, otherwise <i>false</i>}
      */
     public boolean isDead() {
-        return this.handle().isDead();
-    }
-
-    public boolean exists() {
-        Player player = this.handle();
-        return player != null;
+        return this.playerData.dead;
     }
 
     /**
      * {@return the name of the current queue}
      */
-    public String getQueue() {
+    public String getQueueName() {
         return this.queue;
     }
 
@@ -98,25 +117,40 @@ public class GamePlayer implements DataHolder<PlayerData> {
      *                          the player can be teleported
      */
     public void teleport(Location location, boolean whenTeleportReady) {
+        if (location == null) {
+            return;
+        }
+
+        location = location.clone();
+
+        if (whenTeleportReady && (isDead() || !isOnline()))
+            playerData.teleportLocation = location;
+        else
+            player.teleport(location);
+    }
+
+    public void teleportAsync(Location location, boolean whenTeleportReady) {
         if (location == null)
             return;
 
+        location = location.clone();
+
         if (whenTeleportReady && (isDead() || !isOnline()))
-            teleportLocation = location;
+            playerData.teleportLocation = location;
         else
-            handle().teleport(location);
+            player.teleportAsync(location);
     }
 
-    public boolean hasTeleportLocation() {
-        return teleportLocation != null;
+    public void sendMessage(Component message) {
+        player.sendMessage(message);
     }
 
-    public Location getTeleportLocation() {
-        return teleportLocation.clone();
+    public boolean hasPermission(String permission) {
+        return player.hasPermission(permission);
     }
 
-    public void setTeleportLocation(Location location) {
-        this.teleportLocation = location;
+    public Player getPlayer() {
+        return this.player;
     }
 
     /**
@@ -124,7 +158,7 @@ public class GamePlayer implements DataHolder<PlayerData> {
      * Does not physically change their queues.
      *
      * @param queue the name of the queue
-     * @see net.malfact.gamecore.queues.GameQueue#addPlayer(GamePlayer)  GameQueue.addPlayer(GamePlayer)
+     * @see net.malfact.gamecore.queue.GameQueue#addPlayer(GamePlayer)  GameQueue.addPlayer(GamePlayer)
      */
     public void setQueue(String queue) {
         if (queue == null)
@@ -135,10 +169,10 @@ public class GamePlayer implements DataHolder<PlayerData> {
 
         if (GameCore.tagPlayers) {
             if (!lastQueue.isEmpty())
-                handle().removeScoreboardTag(GameCore.queuePrefix + lastQueue);
+                player.removeScoreboardTag(GameCore.queuePrefix + lastQueue);
 
             if (!queue.isEmpty())
-                handle().addScoreboardTag(GameCore.queuePrefix + queue);
+                player.addScoreboardTag(GameCore.queuePrefix + queue);
         }
 
     }
@@ -147,18 +181,18 @@ public class GamePlayer implements DataHolder<PlayerData> {
         return GameCore.getTeamManager().getTeam(this);
     }
 
+    public String getTeamName() {
+        GameTeam team = getTeam();
+        return team == null ? "" : team.name;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof GamePlayer && this.uuid.equals(((GamePlayer) obj).uuid);
+        return obj instanceof GamePlayer && this.playerData.uuid.equals(((GamePlayer) obj).playerData.uuid);
     }
 
     @Override
-    public PlayerData getDataObject() {
-        return new PlayerData(uuid, handle().getName(), teleportLocation);
-    }
-
-    @Override
-    public void setDataObject(PlayerData data) {
-        this.teleportLocation = data.teleportLocation;
+    public String toString() {
+        return playerData.name + "@{" + playerData.uuid + "}";
     }
 }

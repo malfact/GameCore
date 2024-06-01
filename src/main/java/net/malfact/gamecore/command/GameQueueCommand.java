@@ -176,14 +176,14 @@ public class GameQueueCommand {
 
         GamePlayer gamePlayer = Validate.isGamePlayer(player);
 
-        if (gamePlayer.getQueue().isEmpty()) {
+        if (gamePlayer.getQueueName().isEmpty()) {
             if (proxiedCaller != null)
                 throw CommandAPIBukkit.failWithAdventureComponent(Messages.get("PLAYER_NOT_IN_QUEUE", gamePlayer.getName()));
             else
                 throw CommandAPIBukkit.failWithAdventureComponent(Messages.get("SELF_NOT_IN_QUEUE"));
         }
 
-        GameQueue queue = GameCore.getQueueManager().getQueue(gamePlayer.getQueue());
+        GameQueue queue = GameCore.getQueueManager().getQueue(gamePlayer.getQueueName());
         queue.removePlayer(gamePlayer);
 
         if (proxiedCaller != null)
@@ -193,10 +193,10 @@ public class GameQueueCommand {
     public static void leaveQueueOther(CommandSender sender, CommandArguments arguments) throws WrapperCommandSyntaxException {
         GamePlayer player = Validate.isGamePlayer((Player) arguments.get("player"));
 
-        if (player.getQueue().isEmpty())
+        if (player.getQueueName().isEmpty())
             throw CommandAPIBukkit.failWithAdventureComponent(Messages.get("PLAYER_NOT_IN_QUEUE", player.getName()));
 
-        GameQueue queue = GameCore.getQueueManager().getQueue(player.getQueue());
+        GameQueue queue = GameCore.getQueueManager().getQueue(player.getQueueName());
         queue.removePlayer(player);
 
         sender.sendMessage(Messages.get("PLAYER_LEFT_QUEUE", player.getName(), queue.name));

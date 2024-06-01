@@ -8,7 +8,12 @@ public abstract class GameManager {
         this.plugin = plugin;
     }
 
-    public abstract void save();
+    public void save() {}
 
-    public abstract void load();
+    public void load() {}
+
+    /**
+     * Runs cleanup on this Game Manager
+     */
+    public void clean() {}
 }
