@@ -41,56 +41,54 @@ public class GameCoreExpansion extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String params) {
-        if (params.substring(0,6).equalsIgnoreCase("player")) {
-            params = params.substring(7);
-
-            GamePlayer gamePlayer = GameCore.getPlayerManager().getPlayer(player);
-            if (gamePlayer == null)
-                return "none";
-
-            if (params.equalsIgnoreCase("queue"))
-                return gamePlayer.getQueue();
-            else if (params.equalsIgnoreCase("team")) {
-                GameTeam team = gamePlayer.getTeam();
-                return team == null ? "none" : team.name;
-            }
-
-            return "";
-        }
 
         int selectorStart = params.indexOf('{');
         int selectorEnd = params.indexOf('}');
-        if (selectorStart == -1 || selectorEnd == -1)
-            return null;
-
-        String selector = params.substring(selectorStart+1,selectorEnd);
-        params = params.replace("_{" + selector + "}", "");
+        String selector = null;
+        if (selectorStart != -1 && selectorEnd != -1) {
+            selector = params.substring(selectorStart+1,selectorEnd);
+            params = params.replace("_{" + selector + "}", "").toLowerCase();
+        }
 
         String[] args = params.split("_");
 
-        if (args.length < 2) return "";
+        if (args.length <= 1)
+            return null;
 
-        if (args[0].equalsIgnoreCase("queue")) {
-            GameQueue queue = GameCore.getQueueManager().getQueue(selector);
+        switch(args[0]) {
+            case "player":
+                GamePlayer gamePlayer = GameCore.getPlayerManager().getPlayer(player);
+                if (gamePlayer == null)
+                    return "none";
 
-            if (queue == null)
-                return null;
+                if (args[1].equals("queue"))
+                    return gamePlayer.getQueueName();
+                else if (args[1].equals("team"))
+                    return gamePlayer.getTeamName();
+                break;
+            case "queue":
+                if (selector == null) return null;
 
-            switch (args[1].toLowerCase()) {
-                case "count":
+                GameQueue queue = GameCore.getQueueManager().getQueue(selector);
+
+                if (queue == null) return null;
+
+                if (args[1].equals("count"))
                     return ""+queue.getPlayerCount();
-                case "enabled":
+                else if (args[1].equals("enabled"))
                     return queue.getEnabled() ? "true" : "false";
-            }
-        } else if (args[1].equalsIgnoreCase("team")) {
-            GameTeam team = GameCore.getTeamManager().getTeam(selector);
+                break;
+            case "team":
+                if (selector == null) return null;
 
-            if (team == null)
-                return null;
+                GameTeam team = GameCore.getTeamManager().getTeam(selector);
 
-            if (args[1].equalsIgnoreCase("count")) {
-                return "" + team.getPlayerCount();
-            }
+                if (team == null) return null;
+
+                if (args[1].equalsIgnoreCase("count")) {
+                    return "" + team.getPlayerCount();
+                }
+                break;
         }
 
         return null;
