@@ -1,8 +1,8 @@
-package net.malfact.gamecore.teams;
+package net.malfact.gamecore.team;
 
 import net.malfact.gamecore.event.PlayerJoinTeamEvent;
 import net.malfact.gamecore.event.PlayerLeaveTeamEvent;
-import net.malfact.gamecore.players.GamePlayer;
+import net.malfact.gamecore.player.GamePlayer;
 import net.malfact.gamecore.util.DataHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

@@ -1,7 +1,7 @@
 package net.malfact.gamecore.event;
 
-import net.malfact.gamecore.players.GamePlayer;
-import net.malfact.gamecore.teams.GameTeam;
+import net.malfact.gamecore.player.GamePlayer;
+import net.malfact.gamecore.team.GameTeam;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;

@@ -1,4 +1,4 @@
-package net.malfact.gamecore.commands;
+package net.malfact.gamecore.command;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -9,7 +9,7 @@ import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.executors.ExecutorType;
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.Messages;
-import net.malfact.gamecore.teams.GameTeam;
+import net.malfact.gamecore.team.GameTeam;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;

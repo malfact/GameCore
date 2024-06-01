@@ -1,4 +1,4 @@
-package net.malfact.gamecore.queues;
+package net.malfact.gamecore.queue;
 
 public class QueueData {
     public final String name;

@@ -1,4 +1,4 @@
-package net.malfact.gamecore.queues;
+package net.malfact.gamecore.queue;
 
 import com.google.gson.reflect.TypeToken;
 import net.malfact.gamecore.GameCore;

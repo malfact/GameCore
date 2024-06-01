@@ -1,4 +1,4 @@
-package net.malfact.gamecore.teams;
+package net.malfact.gamecore.team;
 
 import org.bukkit.Location;
 

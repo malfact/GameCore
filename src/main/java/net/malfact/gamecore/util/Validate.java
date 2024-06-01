@@ -1,7 +1,7 @@
 package net.malfact.gamecore.util;
 
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.players.GamePlayer;
+import net.malfact.gamecore.player.GamePlayer;
 import org.bukkit.entity.Player;
 
 public class Validate {

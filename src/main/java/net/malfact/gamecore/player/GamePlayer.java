@@ -1,9 +1,7 @@
-package net.malfact.gamecore.players;
+package net.malfact.gamecore.player;
 
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.teams.GameTeam;
-import net.malfact.gamecore.util.DataHolder;
-import org.bukkit.Bukkit;
+import net.malfact.gamecore.team.GameTeam;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 

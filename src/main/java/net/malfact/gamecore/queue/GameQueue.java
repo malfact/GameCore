@@ -1,8 +1,8 @@
-package net.malfact.gamecore.queues;
+package net.malfact.gamecore.queue;
 
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.players.GamePlayer;
-import net.malfact.gamecore.teams.GameTeam;
+import net.malfact.gamecore.player.GamePlayer;
+import net.malfact.gamecore.team.GameTeam;
 import net.malfact.gamecore.util.DataHolder;
 import net.malfact.gamecore.Messages;
 import org.jetbrains.annotations.NotNull;

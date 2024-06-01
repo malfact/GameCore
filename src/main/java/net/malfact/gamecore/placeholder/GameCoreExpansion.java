@@ -2,9 +2,9 @@ package net.malfact.gamecore.placeholder;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.players.GamePlayer;
-import net.malfact.gamecore.queues.GameQueue;
-import net.malfact.gamecore.teams.GameTeam;
+import net.malfact.gamecore.player.GamePlayer;
+import net.malfact.gamecore.queue.GameQueue;
+import net.malfact.gamecore.team.GameTeam;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

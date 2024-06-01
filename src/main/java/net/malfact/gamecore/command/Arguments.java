@@ -1,10 +1,10 @@
-package net.malfact.gamecore.commands;
+package net.malfact.gamecore.command;
 
 import dev.jorel.commandapi.arguments.*;
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.Messages;
-import net.malfact.gamecore.queues.GameQueue;
-import net.malfact.gamecore.teams.GameTeam;
+import net.malfact.gamecore.queue.GameQueue;
+import net.malfact.gamecore.team.GameTeam;
 
 public class Arguments {
 

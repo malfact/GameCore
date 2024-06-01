@@ -1,12 +1,12 @@
-package net.malfact.gamecore.commands;
+package net.malfact.gamecore.command;
 
 import dev.jorel.commandapi.CommandAPIBukkit;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.executors.CommandArguments;
 import dev.jorel.commandapi.wrappers.NativeProxyCommandSender;
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.players.GamePlayer;
-import net.malfact.gamecore.teams.GameTeam;
+import net.malfact.gamecore.player.GamePlayer;
+import net.malfact.gamecore.team.GameTeam;
 import net.malfact.gamecore.Messages;
 import net.malfact.gamecore.util.Validate;
 import org.bukkit.Location;

@@ -1,9 +1,9 @@
-package net.malfact.gamecore.teams;
+package net.malfact.gamecore.team;
 
 import com.google.gson.reflect.TypeToken;
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.GameManager;
-import net.malfact.gamecore.players.GamePlayer;
+import net.malfact.gamecore.player.GamePlayer;
 import net.malfact.gamecore.util.Json;
 import org.bukkit.Bukkit;
 
