@@ -52,7 +52,7 @@ public class GameQueueCommand {
 
             String[] names = players.stream().map(player -> {
                 boolean online = player.isOnline();
-                return (online ? "<green>" + player.getName() + "</green>" : "<red>" + player.getName() + "<red>");
+                return (online ? "<green>" + player.getName() + "</green>" : "<red>" + player.getName() + "</red>");
             }).toArray(String[]::new);
 
             int online = 0;
