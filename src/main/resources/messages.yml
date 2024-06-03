@@ -1,6 +1,7 @@
 CONFIG_RELOADED: "Reloaded 'config.yml'"
 
 COUNT_JOINED_QUEUE: "<1> players have joined the queue '<2>'"
+COUNT_JOINED_TEAM: "<1> players have joined the team [<2>]"
 COUNT_POPPED_QUEUE_TAG: "<1> players were popped from the queue '<2>' with the tag \"<3>\""
 COUNT_POPPED_QUEUE_TEAM: "<1> players were popped from the queue '<2>' into the team [<3>]'"
 
