@@ -233,8 +233,11 @@ public class GameQueueCommand {
         GameQueue queue = (GameQueue) arguments.get("queue");
         GameTeam team = (GameTeam) arguments.get("team");
 
-        int count = queue.getPlayerCount();
-        queue.popWithTeam(team);
+        Optional<Integer> optionalCount = arguments.getOptionalByClass("count", Integer.class);
+
+        int count = optionalCount.orElseGet(() -> queue.getPlayerCount());
+
+        queue.popWithTeam(team, count);
 
         sender.sendMessage(Messages.get("COUNT_POPPED_QUEUE_TEAM", ""+count, queue.name, team.name));
         return count;

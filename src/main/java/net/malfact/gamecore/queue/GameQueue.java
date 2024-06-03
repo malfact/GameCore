@@ -160,6 +160,24 @@ public class GameQueue implements DataHolder<QueueData> {
         }
     }
 
+    public int popWithTeam(@NotNull GameTeam team, int count) {
+        Objects.requireNonNull(team);
+
+        Iterator<GamePlayer> iterator = players.iterator();
+
+        int popped = 0;
+        while (popped < count && iterator.hasNext()) {
+            GamePlayer player = iterator.next();
+            team.addPlayer(player);
+            player.setQueue("");
+            iterator.remove();
+
+            popped++;
+        }
+
+        return popped;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
