@@ -1,9 +1,14 @@
 plugins {
     id 'java'
+    // Shadow
+    id "io.github.goooler.shadow" version "8.1.7"
 }
 
 group = 'net.malfact'
 version = '1.0.9-SNAPSHOT'
+
+def Properties properties = new Properties()
+properties.load(project.rootProject.file("local.properties").newDataInputStream())
 
 repositories {
     mavenCentral()
@@ -13,12 +18,26 @@ repositories {
     maven { url = "https://repo.codemc.org/repository/maven-public/" }
     // PlaceholderAPI
     maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+
+    // Luaj2
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/malfact/luaj")
+        credentials {
+            username = properties.getProperty("gpr.user")
+            password = properties.getProperty("gpr.key")
+        }
+    }
 }
+
+def luaj2 = "net.malfact.luaj:luaj2:1.1.0"
 
 dependencies {
     compileOnly "io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT"
     compileOnly 'me.clip:placeholderapi:2.11.6'
     compileOnly "dev.jorel:commandapi-bukkit-core:9.4.2"
+    implementation luaj2
+//    implementation fileTree(dir: 'lib', include: '*.jar')
 }
 
 def targetJavaVersion = 21
@@ -29,6 +48,13 @@ java {
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
+}
+
+shadowJar {
+    dependencies {
+        include(dependency(luaj2))
+    }
+    archiveClassifier.set('')
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -45,4 +71,28 @@ processResources {
     filesMatching('paper-plugin.yml') {
         expand props
     }
+}
+
+tasks.register('deleteOldCopy', Delete) {
+    def copyToDir = properties.getProperty("copy-build-dir")
+    if (copyToDir == null)
+        return
+
+    delete(fileTree(copyToDir).matching {
+        include "${rootProject.name}**.jar"
+    }.files)
+
+    println("Deleted old Jars")
+}
+
+tasks.register('copyJarTo', Copy) {
+    def copyToDir = properties.getProperty("copy-build-dir")
+    if (copyToDir == null)
+        return
+
+    dependsOn(deleteOldCopy)
+    dependsOn(shadowJar)
+    from shadowJar
+    into copyToDir
+    println("Copied Jars to ${copyToDir}")
 }
