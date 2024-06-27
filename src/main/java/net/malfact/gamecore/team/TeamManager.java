@@ -2,14 +2,14 @@ package net.malfact.gamecore.team;
 
 import com.google.gson.reflect.TypeToken;
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.GameManager;
+import net.malfact.gamecore.GameCoreManager;
 import net.malfact.gamecore.player.GamePlayer;
 import net.malfact.gamecore.util.Json;
 import org.bukkit.Bukkit;
 
 import java.util.*;
 
-public class TeamManager extends GameManager {
+public class TeamManager extends GameCoreManager {
     private static final Map<String, GameTeam> TEAMS = new HashMap<>();
     private static final Map<UUID, String> PLAYER_TEAMS = new HashMap<>();
 

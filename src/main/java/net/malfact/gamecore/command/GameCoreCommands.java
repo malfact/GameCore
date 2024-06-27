@@ -9,10 +9,15 @@ import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.executors.ExecutorType;
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.Messages;
+import net.malfact.gamecore.game.Game;
+import net.malfact.gamecore.game.LuaGameBuilder;
+import net.malfact.gamecore.script.LuaScript;
 import net.malfact.gamecore.team.GameTeam;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.luaj.vm2.LuaConstant;
+import org.luaj.vm2.lib.jse.coercion.CoerceJavaToLua;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +25,19 @@ import java.util.List;
 public final class GameCoreCommands {
 
     public static void register(JavaPlugin plugin) {
+
+        new CommandAPICommand("game")
+            .withSubcommand(new CommandAPICommand("join")
+                .withArguments(new StringArgument("game"))
+                .executesPlayer((sender, args) -> {
+                    String gameName = args.getUnchecked("game");
+                    Game game = GameCore.getGameManager().getGame(gameName);
+                    if (game == null)
+                        return;
+                    game.joinGame(sender);
+                })
+            )
+            .register(plugin);
 
         /* "gamecore" Command */
         new CommandAPICommand("gamecore")
@@ -38,6 +56,27 @@ public final class GameCoreCommands {
                     sender.sendMessage(Messages.get("QUEUE_SAVED"));
                     GameCore.getTeamManager().save();
                     sender.sendMessage(Messages.get("TEAM_SAVED"));
+                })
+            )
+            .withSubcommand(new CommandAPICommand("reload")
+                .withArguments(new StringArgument("script"))
+                .executes((sender, args) -> {
+                    String scriptName = args.getOrDefaultRaw("script", "");
+                    LuaScript script = GameCore.getScriptManager().getGameScript(scriptName);
+                    if (script == null) {
+                        sender.sendMessage("Invalid Script");
+                        return;
+                    }
+                    sender.sendMessage("Reloading " + scriptName);
+                    GameCore.getGameManager().unregisterGame(scriptName);
+                    GameCore.getScriptManager().reloadGameScript(scriptName);
+                    LuaGameBuilder builder = new LuaGameBuilder(script);
+                    script.getEnvironment().set("GameBuilder", CoerceJavaToLua.coerce(builder));
+                    script.run();
+                    script.getEnvironment().set("GameBuilder", LuaConstant.NIL);
+                    Game game = builder.build();
+                    GameCore.getGameManager().registerGame(game);
+                    game.start();
                 })
             )
             .register(plugin);

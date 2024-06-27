@@ -1,10 +1,10 @@
 package net.malfact.gamecore;
 
-public abstract class GameManager {
+public abstract class GameCoreManager {
 
     protected final GameCore plugin;
 
-    public GameManager(GameCore plugin) {
+    public GameCoreManager(GameCore plugin) {
         this.plugin = plugin;
     }
 

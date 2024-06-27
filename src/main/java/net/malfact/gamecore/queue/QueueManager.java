@@ -2,13 +2,13 @@ package net.malfact.gamecore.queue;
 
 import com.google.gson.reflect.TypeToken;
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.GameManager;
+import net.malfact.gamecore.GameCoreManager;
 import net.malfact.gamecore.util.Json;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class QueueManager extends GameManager {
+public class QueueManager extends GameCoreManager {
     private final Map<String, GameQueue> QUEUES = new HashMap<>();
 
     public QueueManager(GameCore plugin) {

@@ -1,5 +1,6 @@
 spawn-on-join: true
-
+lua:
+  auto-load-scripts: true
 # Settings on how and when data should be cleaned.
 cleaning:
   # Player State cleaning settings

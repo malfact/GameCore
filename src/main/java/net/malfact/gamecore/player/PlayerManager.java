@@ -2,7 +2,7 @@ package net.malfact.gamecore.player;
 
 import com.google.gson.reflect.TypeToken;
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.GameManager;
+import net.malfact.gamecore.GameCoreManager;
 import net.malfact.gamecore.event.PlayerJoinTeamEvent;
 import net.malfact.gamecore.event.PlayerLeaveTeamEvent;
 import net.malfact.gamecore.team.GameTeam;
@@ -21,9 +21,12 @@ import org.jetbrains.annotations.NotNull;
 import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
-public final class PlayerManager extends GameManager implements Listener {
+public final class PlayerManager extends GameCoreManager implements Listener {
 
     private final Map<UUID, GamePlayer> players;
     private final Map<UUID, BukkitTask> cleaningTasks;
