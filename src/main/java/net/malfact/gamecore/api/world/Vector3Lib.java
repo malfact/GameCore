@@ -1,5 +1,10 @@
 package net.malfact.gamecore.api.world;
 
+import net.malfact.gamecore.api.InstancedLib;
+import net.malfact.gamecore.api.userdata.UserdataProvider;
+import net.malfact.gamecore.script.Instance;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.luaj.vm2.*;
@@ -11,34 +16,42 @@ import org.luaj.vm2.lib.ZeroArgFunction;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class Vector3Lib extends TwoArgFunction {
+public class Vector3Lib extends InstancedLib implements UserdataProvider {
 
     private static final LuaFunction VEC3_NEW = new Vector3_new();
     private static final LuaFunction VEC3_RANDOM = new Vector3_random();
-    private static final LuaFunction VEC3_INDEX = new Vector3_index();
+    private final LuaFunction VEC3_INDEX = new Vector3_index();
 
-    private static final LuaFunction VEC3_MAX = new TwoVec3Function("max", Vector3::max, Vector3Lib::getValueOf);
-    private static final LuaFunction VEC3_MIN = new TwoVec3Function("min", Vector3::max, Vector3Lib::getValueOf);
+    private static final LuaFunction VEC3_MAX = new TwoVec3Function("max", Vector3::max, Vector3Lib::userdataOf);
+    private static final LuaFunction VEC3_MIN = new TwoVec3Function("min", Vector3::max, Vector3Lib::userdataOf);
 
-    private static final LuaTable FUNCTIONS = new LuaTable();
-    static {
+    private final LuaTable FUNCTIONS = new LuaTable();
+
+    // Requires Library Functions
+    public static final LuaValue VEC3_ZERO = userdataOf(Vector3.Zero);
+    public static final LuaValue VEC3_UP = userdataOf(Vector3.Up);
+    public static final LuaValue VEC3_DOWN = userdataOf(Vector3.Down);
+
+    public Vector3Lib(Instance instance) {
+        super(instance);
+
         final NamedFunction[] functions = new NamedFunction[] {
-            new OneVec3Function("clone",Vector3::copy, Vector3Lib::getValueOf),
+            new OneVec3Function("clone",Vector3::copy, Vector3Lib::userdataOf),
             new OneVec3Function("length",Vector3::length, LuaValue::valueOf),
             new OneVec3Function("lengthSquared", Vector3::lengthSquared, LuaValue::valueOf),
-            new OneVec3Function("neg", Vector3::negate, Vector3Lib::getValueOf),
-            new OneVec3Function("normalize", Vector3::normalize, Vector3Lib::getValueOf),
+            new OneVec3Function("neg", Vector3::negate, Vector3Lib::userdataOf),
+            new OneVec3Function("normalize", Vector3::normalize, Vector3Lib::userdataOf),
             new OneVec3Function("toString", Vector3::toString, LuaValue::valueOf),
-            new OneVec3Function("floor", Vector3::floor, Vector3Lib::getValueOf),
-            new OneVec3Function("ceil", Vector3::ceil, Vector3Lib::getValueOf),
+            new OneVec3Function("floor", Vector3::floor, Vector3Lib::userdataOf),
+            new OneVec3Function("ceil", Vector3::ceil, Vector3Lib::userdataOf),
             new TwoVec3Function("distance", Vector3::distance, LuaValue::valueOf),
             new TwoVec3Function("distanceSquared", Vector3::distanceSquared, LuaValue::valueOf),
-            new TwoVec3Function("mid", Vector3::midpoint, Vector3Lib::getValueOf),
-            new TwoVec3Function("cross", Vector3::crossProduct, Vector3Lib::getValueOf),
+            new TwoVec3Function("mid", Vector3::midpoint, Vector3Lib::userdataOf),
+            new TwoVec3Function("cross", Vector3::crossProduct, Vector3Lib::userdataOf),
             new TwoVec3Function("angle", Vector3::angle, LuaValue::valueOf),
             new TwoVec3Function("dot", Vector3::dot, LuaValue::valueOf),
-            new TwoVec3Function("add", Vector3::add, Vector3Lib::getValueOf),
-            new TwoVec3Function("sub", Vector3::subtract, Vector3Lib::getValueOf),
+            new TwoVec3Function("add", Vector3::add, Vector3Lib::userdataOf),
+            new TwoVec3Function("sub", Vector3::subtract, Vector3Lib::userdataOf),
             new Vector3_mul(),
             new Vector3_div()
         };
@@ -47,11 +60,6 @@ public class Vector3Lib extends TwoArgFunction {
             FUNCTIONS.set(f.getName(), f.getFunction());
         }
     }
-
-    // Requires Library Functions
-    public static final LuaValue VEC3_ZERO = getValueOf(Vector3.Zero);
-    public static final LuaValue VEC3_UP = getValueOf(Vector3.Up);
-    public static final LuaValue VEC3_DOWN = getValueOf(Vector3.Down);
 
     @Override
     public LuaValue call(LuaValue module, LuaValue env) {
@@ -74,11 +82,31 @@ public class Vector3Lib extends TwoArgFunction {
         return env;
     }
 
-    public static LuaValue getValueOf(@NotNull Vector vec) {
-        return getValueOf(new Vector3(vec.getX(), vec.getY(), vec.getZ()));
+    public static Vector toVector(@NotNull Vector3 vec) {
+        return new Vector(vec.x, vec.y, vec.z);
     }
 
-    public static LuaValue getValueOf(@NotNull Vector3 vec) {
+    public static Location toLocation(@NotNull Vector3 vec, World world) {
+        return new Location(world, vec.x, vec.y, vec.z);
+    }
+
+    private static Vector3 checkVector3(LuaValue luaValue) {
+        return luaValue.checkuserdata(Vector3.class);
+    }
+
+    @Override
+    public boolean accepts(Object o) {
+        return (o instanceof Vector3) || (o instanceof Vector);
+    }
+
+    @Override
+    public LuaValue getUserdataOf(Object o) {
+        Vector3 vec = null;
+        if (o instanceof Vector v)
+            vec = new Vector3(v.getX(), v.getY(), v.getZ());
+        else
+            vec = (Vector3) o;
+
         LuaTable meta = new LuaTable();
         meta.set(LuaConstant.MetaTag.INDEX, VEC3_INDEX);
         meta.set(LuaConstant.MetaTag.TOSTRING, FUNCTIONS.get("toString"));
@@ -94,14 +122,6 @@ public class Vector3Lib extends TwoArgFunction {
         meta.set(LuaConstant.MetaTag.METATABLE, LuaConstant.FALSE);
 
         return new LuaUserdata(vec, meta);
-    }
-
-    public static Vector toVector(@NotNull Vector3 vec) {
-        return new Vector(vec.x, vec.y, vec.z);
-    }
-
-    private static Vector3 checkVector3(LuaValue luaValue) {
-        return luaValue.checkuserdata(Vector3.class);
     }
 
     // Vector3::new(x, y, z) -> Vector3
@@ -124,7 +144,7 @@ public class Vector3Lib extends TwoArgFunction {
 
         @Override
         public LuaValue call(LuaValue x, LuaValue y, LuaValue z) {
-            return getValueOf(new Vector3(x.checkdouble(), y.checkdouble(), z.checkdouble()));
+            return Vector3Lib.userdataOf(new Vector3(x.checkdouble(), y.checkdouble(), z.checkdouble()));
         }
     }
 
@@ -133,12 +153,12 @@ public class Vector3Lib extends TwoArgFunction {
 
         @Override
         public LuaValue call() {
-            return getValueOf(Vector3.random());
+            return Vector3Lib.userdataOf(Vector3.random());
         }
     }
 
     // __index(tbl, key) -> value
-    private static class Vector3_index extends TwoArgFunction {
+    private class Vector3_index extends TwoArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg1, LuaValue key) {
@@ -165,7 +185,7 @@ public class Vector3Lib extends TwoArgFunction {
         LuaFunction getFunction();
     }
 
-    private static class Vector3_mul extends TwoArgFunction implements NamedFunction  {
+    private class Vector3_mul extends TwoArgFunction implements NamedFunction  {
 
         private Vector3_mul() {
             this.name = "mul";
@@ -175,9 +195,9 @@ public class Vector3Lib extends TwoArgFunction {
         public LuaValue call(LuaValue arg1, LuaValue arg2) {
             Vector3 vec = checkVector3(arg1);
             if (arg2.isnumber())
-                return getValueOf(vec.multiply(arg2.checkdouble()));
+                return getUserdataOf(vec.multiply(arg2.checkdouble()));
             else
-                return getValueOf(vec.multiply(checkVector3(arg2)));
+                return getUserdataOf(vec.multiply(checkVector3(arg2)));
         }
 
         @Override
@@ -191,7 +211,7 @@ public class Vector3Lib extends TwoArgFunction {
         }
     }
 
-    private static class Vector3_div extends TwoArgFunction implements NamedFunction  {
+    private class Vector3_div extends TwoArgFunction implements NamedFunction  {
 
         private Vector3_div() {
             this.name = "div";
@@ -201,9 +221,9 @@ public class Vector3Lib extends TwoArgFunction {
         public LuaValue call(LuaValue arg1, LuaValue arg2) {
             Vector3 vec = checkVector3(arg1);
             if (arg2.isnumber())
-                return getValueOf(vec.divide(arg2.checkdouble()));
+                return getUserdataOf(vec.divide(arg2.checkdouble()));
             else
-                return getValueOf(vec.divide(checkVector3(arg2)));
+                return getUserdataOf(vec.divide(checkVector3(arg2)));
         }
 
         @Override

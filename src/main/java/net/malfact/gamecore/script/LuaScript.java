@@ -21,7 +21,7 @@ public class LuaScript {
     LuaScript(File file) {
         this.path = file.getPath();
         this.name = file.getName().substring(0, file.getName().lastIndexOf('.'));
-        GameCore.getInstance().logInfo(path);
+
     }
 
     public String getName() {
@@ -68,14 +68,20 @@ public class LuaScript {
         return this.environment;
     }
 
-    public void run() {
-        if (chunk == null || chunk.isnil())
-            return;
+    public boolean run() {
+        if (chunk == null || chunk.isnil()) {
+            GameCore.getInstance().logError("Error in " + this + ": No Chunk!");
+            return false;
+        }
+
         try {
             chunk.call();
         } catch (LuaError e) {
             GameCore.getInstance().logError("Error in " + this + ":\n" + e.getMessage());
+            return false;
         }
+
+        return true;
     }
 
     @Override

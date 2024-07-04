@@ -1,6 +1,9 @@
 package net.malfact.gamecore.api.world;
 
+import net.malfact.gamecore.api.InstancedLib;
 import net.malfact.gamecore.api.LuaApi;
+import net.malfact.gamecore.api.userdata.UserdataProvider;
+import net.malfact.gamecore.script.Instance;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.luaj.vm2.*;
@@ -9,10 +12,10 @@ import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
 
-public class LocationLib extends TwoArgFunction {
+public class LocationLib extends InstancedLib implements UserdataProvider {
 
     private static final LuaFunction LOC_NEW = new Loc_new();
-    private static final LuaFunction LOC_INDEX = new Loc_index();
+    private final LuaFunction LOC_INDEX = new Loc_index();
     private static final LuaFunction LOC_NEW_INDEX = new Loc_newindex();
 
     private static final LuaTable FUNCTIONS = new LuaTable();
@@ -26,6 +29,10 @@ public class LocationLib extends TwoArgFunction {
         FUNCTIONS.set("toHighest", new Loc_toHighest());
         FUNCTIONS.set("length", new Loc_len());
         FUNCTIONS.set("toString", new Loc_tostring());
+    }
+
+    public LocationLib(Instance instance) {
+        super(instance);
     }
 
     @Override
@@ -43,8 +50,18 @@ public class LocationLib extends TwoArgFunction {
         return env;
     }
 
+    @Override
+    public boolean accepts(Object o) {
+        return o instanceof Location;
+    }
 
-    public static LuaValue getValueOf(Location location) {
+    @Override
+    public LuaValue getUserdataOf(Object o) {
+        if (!accepts(o))
+            return LuaConstant.NIL;
+
+        Location location = (Location) o;
+
         LuaTable meta = new LuaTable();
         meta.set(LuaConstant.MetaTag.INDEX, LOC_INDEX);
         meta.set(LuaConstant.MetaTag.NEWINDEX, LOC_NEW_INDEX);
@@ -79,11 +96,11 @@ public class LocationLib extends TwoArgFunction {
         public Varargs invoke(Varargs args) {
             return switch (args.narg()) {
                 case 0, 1, 5 -> argumentError(args.narg() + 1, "value expected");
-                case 2 -> getValueOf(create(LuaApi.toWorld(args.checkjstring(1)), args.arg(2).checkuserdata(Vector3.class)));
+                case 2 -> LocationLib.userdataOf(create(LuaApi.toWorld(args.checkjstring(1)), args.arg(2).checkuserdata(Vector3.class)));
                 case 4 -> args.isuserdata(2)
-                    ? getValueOf(create(LuaApi.toWorld(args.checkjstring(1)), args.arg(2).checkuserdata(Vector3.class), (float) args.checkdouble(3), (float) args.checkdouble(4)))
-                    : getValueOf(new Location(LuaApi.toWorld(args.checkjstring(1)), args.checkdouble(2), args.checkdouble(3), args.checkdouble(4)));
-                default -> getValueOf(new Location(LuaApi.toWorld(args.checkjstring(1)), args.checkdouble(2), args.checkdouble(3), args.checkdouble(4), (float) args.checkdouble(5), (float) args.checkdouble(6)));
+                    ? LocationLib.userdataOf(create(LuaApi.toWorld(args.checkjstring(1)), args.arg(2).checkuserdata(Vector3.class), (float) args.checkdouble(3), (float) args.checkdouble(4)))
+                    : LocationLib.userdataOf(new Location(LuaApi.toWorld(args.checkjstring(1)), args.checkdouble(2), args.checkdouble(3), args.checkdouble(4)));
+                default -> LocationLib.userdataOf(new Location(LuaApi.toWorld(args.checkjstring(1)), args.checkdouble(2), args.checkdouble(3), args.checkdouble(4), (float) args.checkdouble(5), (float) args.checkdouble(6)));
             };
         }
     }
@@ -93,11 +110,11 @@ public class LocationLib extends TwoArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg) {
-            return getValueOf(arg.checkuserdata(Location.class).clone());
+            return LocationLib.userdataOf(arg.checkuserdata(Location.class).clone());
         }
     }
 
-    private static class Loc_index extends TwoArgFunction {
+    private class Loc_index extends TwoArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg1, LuaValue key) {
@@ -114,8 +131,8 @@ public class LocationLib extends TwoArgFunction {
                 case "blockX" -> valueOf(loc.getBlockX());
                 case "blockY" -> valueOf(loc.getBlockY());
                 case "blockZ" -> valueOf(loc.getBlockZ());
-                case "position" -> Vector3Lib.getValueOf(loc.toVector());
-                case "direction" -> Vector3Lib.getValueOf(loc.getDirection());
+                case "position" ->  instance.getUserdataOf(loc.toVector());
+                case "direction" -> instance.getUserdataOf(loc.getDirection());
                 case "yaw" -> valueOf(loc.getYaw());
                 case "pitch" -> valueOf(loc.getPitch());
                 default -> FUNCTIONS.get(key);
@@ -150,7 +167,7 @@ public class LocationLib extends TwoArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg) {
-            return getValueOf(arg.checkuserdata(Location.class).clone().multiply(-1));
+            return LocationLib.userdataOf(arg.checkuserdata(Location.class).clone().multiply(-1));
         }
     }
 
@@ -170,7 +187,7 @@ public class LocationLib extends TwoArgFunction {
             else
                 return arg1.add(arg2);
 
-            return getValueOf(loc);
+            return LocationLib.userdataOf(loc);
         }
     }
 
@@ -190,7 +207,7 @@ public class LocationLib extends TwoArgFunction {
             else
                 return arg1.sub(arg2);
 
-            return getValueOf(loc);
+            return LocationLib.userdataOf(loc);
         }
     }
 
@@ -199,7 +216,7 @@ public class LocationLib extends TwoArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg1, LuaValue arg2) {
-            return getValueOf(arg1.checkuserdata(Location.class).clone().multiply(arg2.checkdouble()));
+            return LocationLib.userdataOf(arg1.checkuserdata(Location.class).clone().multiply(arg2.checkdouble()));
         }
     }
 
@@ -208,7 +225,7 @@ public class LocationLib extends TwoArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg1, LuaValue arg2) {
-            return getValueOf(arg1.checkuserdata(Location.class).clone().multiply(1.0/arg2.checkdouble()));
+            return LocationLib.userdataOf(arg1.checkuserdata(Location.class).clone().multiply(1.0/arg2.checkdouble()));
 
         }
     }
@@ -218,7 +235,7 @@ public class LocationLib extends TwoArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg) {
-            return getValueOf(arg.checkuserdata(Location.class).toHighestLocation());
+            return LocationLib.userdataOf(arg.checkuserdata(Location.class).toHighestLocation());
         }
     }
 

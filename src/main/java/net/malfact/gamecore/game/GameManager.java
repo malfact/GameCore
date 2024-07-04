@@ -19,13 +19,14 @@ public class GameManager extends GameCoreManager {
         if (games.containsKey(game.getName()))
             throw new IllegalArgumentException("Game " + game.getName() + " already registered");
 
+        GameCore.logDebug("Registered Game: " + game.getName());
         games.put(game.getName(), game);
     }
 
     public void unregisterGame(String name) {
         var game = games.remove(name);
         if (game != null && game.isRunning())
-            game.stop();
+            game.forceStop();
     }
 
     public Game getGame(String game) {
@@ -42,6 +43,7 @@ public class GameManager extends GameCoreManager {
 
         for (Game game : games.values()) {
             game.stop();
+            game.clean();
         }
     }
 
