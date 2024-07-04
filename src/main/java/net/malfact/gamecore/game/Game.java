@@ -325,7 +325,11 @@ public abstract class Game {
      * @return running
      */
     public final boolean isRunning() {
-        return state == State.RUNNING;
+        return state == State.RUNNING || state == State.STARTING;
+    }
+
+    public final boolean isActive() {
+        return state != State.STOPPED;
     }
 
     private static class GameTask extends BukkitRunnable {

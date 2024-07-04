@@ -122,7 +122,7 @@ public class BaseEntityHandler extends EntityHandler {
             if (!instance.getGame().hasEntity(entity))
                 return NIL;
 
-            if (!instance.getGame().isRunning())
+            if (!instance.getGame().isActive())
                 return LuaConstant.FALSE;
 
             entity.remove();

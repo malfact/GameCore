@@ -18,40 +18,40 @@ import java.util.function.Function;
 
 public class Vector3Lib extends InstancedLib implements UserdataProvider {
 
-    private static final LuaFunction VEC3_NEW = new Vector3_new();
-    private static final LuaFunction VEC3_RANDOM = new Vector3_random();
+    private final LuaFunction VEC3_NEW = new Vector3_new();
+    private final LuaFunction VEC3_RANDOM = new Vector3_random();
     private final LuaFunction VEC3_INDEX = new Vector3_index();
 
-    private static final LuaFunction VEC3_MAX = new TwoVec3Function("max", Vector3::max, Vector3Lib::userdataOf);
-    private static final LuaFunction VEC3_MIN = new TwoVec3Function("min", Vector3::max, Vector3Lib::userdataOf);
+    private final LuaFunction VEC3_MAX = new TwoVec3Function("max", Vector3::max, this::getUserdataOf);
+    private final LuaFunction VEC3_MIN = new TwoVec3Function("min", Vector3::max, this::getUserdataOf);
 
     private final LuaTable FUNCTIONS = new LuaTable();
 
     // Requires Library Functions
-    public static final LuaValue VEC3_ZERO = userdataOf(Vector3.Zero);
-    public static final LuaValue VEC3_UP = userdataOf(Vector3.Up);
-    public static final LuaValue VEC3_DOWN = userdataOf(Vector3.Down);
+    public final LuaValue VEC3_ZERO =   getUserdataOf(Vector3.Zero);
+    public final LuaValue VEC3_UP =     getUserdataOf(Vector3.Up);
+    public final LuaValue VEC3_DOWN =   getUserdataOf(Vector3.Down);
 
     public Vector3Lib(Instance instance) {
         super(instance);
 
         final NamedFunction[] functions = new NamedFunction[] {
-            new OneVec3Function("clone",Vector3::copy, Vector3Lib::userdataOf),
-            new OneVec3Function("length",Vector3::length, LuaValue::valueOf),
-            new OneVec3Function("lengthSquared", Vector3::lengthSquared, LuaValue::valueOf),
-            new OneVec3Function("neg", Vector3::negate, Vector3Lib::userdataOf),
-            new OneVec3Function("normalize", Vector3::normalize, Vector3Lib::userdataOf),
-            new OneVec3Function("toString", Vector3::toString, LuaValue::valueOf),
-            new OneVec3Function("floor", Vector3::floor, Vector3Lib::userdataOf),
-            new OneVec3Function("ceil", Vector3::ceil, Vector3Lib::userdataOf),
-            new TwoVec3Function("distance", Vector3::distance, LuaValue::valueOf),
-            new TwoVec3Function("distanceSquared", Vector3::distanceSquared, LuaValue::valueOf),
-            new TwoVec3Function("mid", Vector3::midpoint, Vector3Lib::userdataOf),
-            new TwoVec3Function("cross", Vector3::crossProduct, Vector3Lib::userdataOf),
-            new TwoVec3Function("angle", Vector3::angle, LuaValue::valueOf),
-            new TwoVec3Function("dot", Vector3::dot, LuaValue::valueOf),
-            new TwoVec3Function("add", Vector3::add, Vector3Lib::userdataOf),
-            new TwoVec3Function("sub", Vector3::subtract, Vector3Lib::userdataOf),
+            new OneVec3Function("clone",            Vector3::copy,          this::getUserdataOf),
+            new OneVec3Function("length",           Vector3::length,        LuaValue::valueOf),
+            new OneVec3Function("lengthSquared",    Vector3::lengthSquared, LuaValue::valueOf),
+            new OneVec3Function("neg",              Vector3::negate,        this::getUserdataOf),
+            new OneVec3Function("normalize",        Vector3::normalize,     this::getUserdataOf),
+            new OneVec3Function("toString",         Vector3::toString,      LuaValue::valueOf),
+            new OneVec3Function("floor",            Vector3::floor,         this::getUserdataOf),
+            new OneVec3Function("ceil",             Vector3::ceil,          this::getUserdataOf),
+            new TwoVec3Function("distance",         Vector3::distance,      LuaValue::valueOf),
+            new TwoVec3Function("distanceSquared",  Vector3::distanceSquared, LuaValue::valueOf),
+            new TwoVec3Function("mid",              Vector3::midpoint,      this::getUserdataOf),
+            new TwoVec3Function("cross",            Vector3::crossProduct,  this::getUserdataOf),
+            new TwoVec3Function("angle",            Vector3::angle,         LuaValue::valueOf),
+            new TwoVec3Function("dot",              Vector3::dot,           LuaValue::valueOf),
+            new TwoVec3Function("add",              Vector3::add,           this::getUserdataOf),
+            new TwoVec3Function("sub",              Vector3::subtract,      this::getUserdataOf),
             new Vector3_mul(),
             new Vector3_div()
         };
@@ -101,7 +101,7 @@ public class Vector3Lib extends InstancedLib implements UserdataProvider {
 
     @Override
     public LuaValue getUserdataOf(Object o) {
-        Vector3 vec = null;
+        Vector3 vec;
         if (o instanceof Vector v)
             vec = new Vector3(v.getX(), v.getY(), v.getZ());
         else
@@ -125,7 +125,7 @@ public class Vector3Lib extends InstancedLib implements UserdataProvider {
     }
 
     // Vector3::new(x, y, z) -> Vector3
-    private static class Vector3_new extends LibFunction {
+    private class Vector3_new extends LibFunction {
 
         @Override
         public LuaValue call() {
@@ -144,16 +144,16 @@ public class Vector3Lib extends InstancedLib implements UserdataProvider {
 
         @Override
         public LuaValue call(LuaValue x, LuaValue y, LuaValue z) {
-            return Vector3Lib.userdataOf(new Vector3(x.checkdouble(), y.checkdouble(), z.checkdouble()));
+            return getUserdataOf(new Vector3(x.checkdouble(), y.checkdouble(), z.checkdouble()));
         }
     }
 
     // Vector3::random() -> Vector3
-    private static class Vector3_random extends ZeroArgFunction {
+    private class Vector3_random extends ZeroArgFunction {
 
         @Override
         public LuaValue call() {
-            return Vector3Lib.userdataOf(Vector3.random());
+            return getUserdataOf(Vector3.random());
         }
     }
 

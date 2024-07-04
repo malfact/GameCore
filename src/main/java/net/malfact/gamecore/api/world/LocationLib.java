@@ -14,12 +14,15 @@ import org.luaj.vm2.lib.VarArgFunction;
 
 public class LocationLib extends InstancedLib implements UserdataProvider {
 
-    private static final LuaFunction LOC_NEW = new Loc_new();
+    private final LuaFunction LOC_NEW = new Loc_new();
     private final LuaFunction LOC_INDEX = new Loc_index();
     private static final LuaFunction LOC_NEW_INDEX = new Loc_newindex();
 
-    private static final LuaTable FUNCTIONS = new LuaTable();
-    static {
+    private final LuaTable FUNCTIONS = new LuaTable();
+
+    public LocationLib(Instance instance) {
+        super(instance);
+
         FUNCTIONS.set("clone", new Loc_clone());
         FUNCTIONS.set("negate", new Loc_neg());
         FUNCTIONS.set("add", new Loc_add());
@@ -29,10 +32,6 @@ public class LocationLib extends InstancedLib implements UserdataProvider {
         FUNCTIONS.set("toHighest", new Loc_toHighest());
         FUNCTIONS.set("length", new Loc_len());
         FUNCTIONS.set("toString", new Loc_tostring());
-    }
-
-    public LocationLib(Instance instance) {
-        super(instance);
     }
 
     @Override
@@ -82,7 +81,7 @@ public class LocationLib extends InstancedLib implements UserdataProvider {
     // Location::new(world, vec, yaw, pitch)
     // Location::new(world, x, y, z)
     // Location::new(world, x, y, z, yaw, pitch)
-    private static class Loc_new extends VarArgFunction {
+    private class Loc_new extends VarArgFunction {
 
         private Location create(World world, Vector3 vec) {
             return new Location(world, vec.x, vec.y, vec.z);
@@ -96,21 +95,21 @@ public class LocationLib extends InstancedLib implements UserdataProvider {
         public Varargs invoke(Varargs args) {
             return switch (args.narg()) {
                 case 0, 1, 5 -> argumentError(args.narg() + 1, "value expected");
-                case 2 -> LocationLib.userdataOf(create(LuaApi.toWorld(args.checkjstring(1)), args.arg(2).checkuserdata(Vector3.class)));
+                case 2 -> getUserdataOf(create(LuaApi.toWorld(args.checkjstring(1)), args.arg(2).checkuserdata(Vector3.class)));
                 case 4 -> args.isuserdata(2)
-                    ? LocationLib.userdataOf(create(LuaApi.toWorld(args.checkjstring(1)), args.arg(2).checkuserdata(Vector3.class), (float) args.checkdouble(3), (float) args.checkdouble(4)))
-                    : LocationLib.userdataOf(new Location(LuaApi.toWorld(args.checkjstring(1)), args.checkdouble(2), args.checkdouble(3), args.checkdouble(4)));
-                default -> LocationLib.userdataOf(new Location(LuaApi.toWorld(args.checkjstring(1)), args.checkdouble(2), args.checkdouble(3), args.checkdouble(4), (float) args.checkdouble(5), (float) args.checkdouble(6)));
+                    ? getUserdataOf(create(LuaApi.toWorld(args.checkjstring(1)), args.arg(2).checkuserdata(Vector3.class), (float) args.checkdouble(3), (float) args.checkdouble(4)))
+                    : getUserdataOf(new Location(LuaApi.toWorld(args.checkjstring(1)), args.checkdouble(2), args.checkdouble(3), args.checkdouble(4)));
+                default -> getUserdataOf(new Location(LuaApi.toWorld(args.checkjstring(1)), args.checkdouble(2), args.checkdouble(3), args.checkdouble(4), (float) args.checkdouble(5), (float) args.checkdouble(6)));
             };
         }
     }
 
     // Location::clone(loc) -> new Location
-    private static class Loc_clone extends OneArgFunction {
+    private class Loc_clone extends OneArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg) {
-            return LocationLib.userdataOf(arg.checkuserdata(Location.class).clone());
+            return getUserdataOf(arg.checkuserdata(Location.class).clone());
         }
     }
 
@@ -163,17 +162,17 @@ public class LocationLib extends InstancedLib implements UserdataProvider {
     }
 
     // Location::neg(loc) -> new location
-    private static class Loc_neg extends OneArgFunction {
+    private class Loc_neg extends OneArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg) {
-            return LocationLib.userdataOf(arg.checkuserdata(Location.class).clone().multiply(-1));
+            return getUserdataOf(arg.checkuserdata(Location.class).clone().multiply(-1));
         }
     }
 
     // Location::add(loc,vec) -> new location
     // Location::add(loc,loc) -> new location
-    private static class Loc_add extends TwoArgFunction {
+    private class Loc_add extends TwoArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg1, LuaValue arg2) {
@@ -187,13 +186,13 @@ public class LocationLib extends InstancedLib implements UserdataProvider {
             else
                 return arg1.add(arg2);
 
-            return LocationLib.userdataOf(loc);
+            return getUserdataOf(loc);
         }
     }
 
     // Location::sub(loc,vec) -> new location
     // Location::sub(loc,loc) -> new location
-    private static class Loc_sub extends TwoArgFunction {
+    private class Loc_sub extends TwoArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg1, LuaValue arg2) {
@@ -207,35 +206,35 @@ public class LocationLib extends InstancedLib implements UserdataProvider {
             else
                 return arg1.sub(arg2);
 
-            return LocationLib.userdataOf(loc);
+            return getUserdataOf(loc);
         }
     }
 
     // Location::mul(loc,scalar) -> new location
-    private static class Loc_mul extends TwoArgFunction {
+    private class Loc_mul extends TwoArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg1, LuaValue arg2) {
-            return LocationLib.userdataOf(arg1.checkuserdata(Location.class).clone().multiply(arg2.checkdouble()));
+            return getUserdataOf(arg1.checkuserdata(Location.class).clone().multiply(arg2.checkdouble()));
         }
     }
 
     // Location::div(loc,scalar) -> new location
-    private static class Loc_div extends TwoArgFunction {
+    private class Loc_div extends TwoArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg1, LuaValue arg2) {
-            return LocationLib.userdataOf(arg1.checkuserdata(Location.class).clone().multiply(1.0/arg2.checkdouble()));
+            return getUserdataOf(arg1.checkuserdata(Location.class).clone().multiply(1.0/arg2.checkdouble()));
 
         }
     }
 
     // Location::toHighest(loc) -> new location
-    private static class Loc_toHighest extends OneArgFunction {
+    private class Loc_toHighest extends OneArgFunction {
 
         @Override
         public LuaValue call(LuaValue arg) {
-            return LocationLib.userdataOf(arg.checkuserdata(Location.class).toHighestLocation());
+            return getUserdataOf(arg.checkuserdata(Location.class).toHighestLocation());
         }
     }
 

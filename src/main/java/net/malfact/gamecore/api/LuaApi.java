@@ -6,7 +6,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.malfact.gamecore.api.inventory.ItemStackLib;
 import net.malfact.gamecore.api.inventory.meta.ItemMetaLib;
-import net.malfact.gamecore.api.world.LocationLib;
 import net.malfact.gamecore.api.world.Vector3;
 import net.malfact.gamecore.api.world.Vector3Lib;
 import net.malfact.gamecore.script.ScriptManager;
@@ -21,7 +20,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.luaj.vm2.*;
@@ -69,9 +67,6 @@ public final class LuaApi {
             case byte[] n ->            LuaValue.valueOf(n);
             case String s ->            LuaValue.valueOf(s);
             // Bukkit Api
-            case Location v ->          LocationLib.userdataOf(v);
-            case Vector3 v ->           LocationLib.userdataOf(v);
-            case Vector v ->            LocationLib.userdataOf(v);
             case ItemMeta v ->          ItemMetaLib.userdataOf(v);
             case ItemStack v ->         ItemStackLib.userdataOf(v);
             case AttributeInstance v -> AttributeLib.userdataOf(v);
