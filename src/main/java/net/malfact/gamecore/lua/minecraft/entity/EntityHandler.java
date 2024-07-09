@@ -41,10 +41,10 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
 
         meta.set(LuaConstant.MetaTag.INDEX, new InstancedGet<>(this, instance));
         meta.set(LuaConstant.MetaTag.NEWINDEX, new InstancedSet<>(this, instance));
-        meta.set(LuaConstant.MetaTag.TOSTRING, LuaUtil.toFunction(this::__tostring));
-        meta.set(LuaConstant.MetaTag.EQ, LuaUtil.toFunction(this::__eq));
+        meta.set(LuaConstant.MetaTag.TOSTRING, LuaUtil.toFunction(this::onToString));
+        meta.set(LuaConstant.MetaTag.EQ, LuaUtil.toFunction(this::onEquals));
 
-        meta.set("__userdata_type__", "entity");
+        meta.set("__userdata_type__", type());
 
         meta.set(LuaConstant.MetaTag.METATABLE, LuaConstant.FALSE);
 
@@ -106,7 +106,11 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
         return "entity<" + entity.getType().getKey().asMinimalString() + ">";
     }
 
-    private LuaValue __eq(LuaValue self, LuaValue other) {
+    protected String type() {
+        return "entity";
+    }
+
+    private LuaValue onEquals(LuaValue self, LuaValue other) {
         T entity = self.checkuserdata(entityClass);
         if (other.isnil() || other.isuserdata(entityClass))
             return LuaConstant.FALSE;
@@ -114,7 +118,7 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
         return LuaValue.valueOf(entity.getUniqueId().equals(other.touserdata(entityClass).getUniqueId()));
     }
 
-    private LuaValue __tostring(LuaValue self) {
+    private LuaValue onToString(LuaValue self) {
         return LuaValue.valueOf(toString(self.checkuserdata(entityClass)));
     }
 
