@@ -52,6 +52,6 @@ public final class EntityLib extends EventLib {
         Entity entity = location.getWorld().createEntity(location, type.getEntityClass());
         instance.registerEntity(entity);
 
-        return LuaApi.userdataOf(entity);
+        return LuaApi.userdataOf(entity, instance);
     }
 }

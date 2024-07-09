@@ -32,7 +32,7 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
 
     @Override
     public final LuaValue getUserdataOf(T object) {
-        return LuaUtil.valueOf(object.name());
+        return LuaApi.valueOf(object.getName());
     }
 
     @Override
