@@ -35,8 +35,8 @@ public abstract class Game {
         this.cleanables = new ArrayList<>();
     }
 
-    public String getState() {
-        return this.state.toString();
+    public State getState() {
+        return this.state;
     }
 
     /**
@@ -385,7 +385,7 @@ public abstract class Game {
         }
     }
 
-    private enum State {
+    public enum State {
         STOPPED,
         STARTING,
         RUNNING,
