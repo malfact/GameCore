@@ -70,7 +70,7 @@ public class ScriptedGame extends Game {
     }
 
     @Override
-    public void clean() {
+    public void onClean() {
         if (callbacks != null && !callbacks.isEmpty()) {
             for (var callback : callbacks) {
                 EventRegistry.unregisterListener(callback);

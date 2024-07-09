@@ -4,6 +4,7 @@ import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.event.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -26,10 +27,12 @@ public abstract class Game {
 
     protected final List<UUID> players;
     protected final List<Entity> entities;
+    protected final List<Cleanable<?>> cleanables;
 
     protected Game() {
         this.players = new ArrayList<>();
         this.entities = new ArrayList<>();
+        this.cleanables = new ArrayList<>();
     }
 
     public String getState() {
@@ -234,17 +237,29 @@ public abstract class Game {
         Bukkit.getPluginManager().callEvent(new GameStopEvent(this));
         players.clear();
 
-        for (var entity : entities) {
-            entity.remove();
-        }
-
-        this.clean();
-
         if (gameTask != null && !gameTask.isCancelled())
             gameTask.cancel();
 
         stop = false;
         state = State.STOPPED;
+        this.clean();
+    }
+
+    void clean() {
+        for (var entity : entities) {
+            entity.remove();
+        }
+
+        entities.clear();
+
+        for (var player : getPlayers()) {
+            leaveGame(player);
+        }
+
+        cleanables.forEach(Cleanable::clean);
+        cleanables.clear();
+
+        this.onClean();
     }
 
     /**
@@ -291,7 +306,7 @@ public abstract class Game {
     /**
      * Fired during {@link #stop()}, after {@link #onStop()}
      */
-    public abstract void clean();
+    public abstract void onClean();
 
     /**
      * Fired during {@link #start()}
@@ -333,6 +348,10 @@ public abstract class Game {
 
     public final boolean isActive() {
         return state != State.STOPPED;
+    }
+
+    public void registerCleanable(Cleanable<BossBar> cleanable) {
+
     }
 
     private static class GameTask extends BukkitRunnable {
