@@ -123,7 +123,7 @@ public class ItemStackLib implements LuaLib, TypeHandler<ItemStack> {
         meta.set(LuaConstant.MetaTag.NEWINDEX,  func_newindex);
         meta.set(LuaConstant.MetaTag.TOSTRING,  func_toString);
 
-        meta.set("__userdata_type__", "itemstack");
+        meta.set("__userdata_type__", "item_stack");
 
         meta.set(LuaConstant.MetaTag.METATABLE, LuaConstant.FALSE);
 

@@ -113,7 +113,7 @@ public final class ItemMetaLib implements LuaLib, TypeHandler<ItemMeta> {
         meta.set(LuaConstant.MetaTag.NEWINDEX,  func_newindex);
         meta.set(LuaConstant.MetaTag.TOSTRING,  func_tostring);
 
-        meta.set("__userdata_type__", "itemmeta");
+        meta.set("__userdata_type__", "item_meta");
 
         meta.set(LuaConstant.MetaTag.METATABLE, LuaConstant.FALSE);
 

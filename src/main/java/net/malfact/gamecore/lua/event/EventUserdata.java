@@ -83,7 +83,7 @@ public class EventUserdata extends LuaUserdata {
                 };
             }
 
-            return LuaApi.valueOf(method.invokeMethod(event, objArgs));
+            return LuaApi.userdataOf(method.invokeMethod(event, objArgs), instance);
         }
     }
 }

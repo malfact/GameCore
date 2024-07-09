@@ -63,7 +63,7 @@ public class GameLib extends EventLib {
         LuaTable table = new LuaTable();
         int i = 1;
         for (var player : players) {
-            table.set(i++, LuaApi.userdataOf(player));
+            table.set(i++, LuaApi.userdataOf(player, instance));
         }
 
         return table;
@@ -76,7 +76,7 @@ public class GameLib extends EventLib {
         LuaTable table = new LuaTable();
         int i = 1;
         for (var player : players) {
-            table.set(i++, LuaApi.userdataOf(player));
+            table.set(i++, LuaApi.userdataOf(player, instance));
         }
 
         return table;

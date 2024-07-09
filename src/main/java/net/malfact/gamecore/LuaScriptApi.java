@@ -23,22 +23,42 @@ import java.util.Map;
 
 public final class LuaScriptApi implements LuaApi, ScriptApi {
 
+    private final Globals serverGlobals = JsePlatform.standardGlobals();
     private Map<Class<?>, TypeHandler<?>> typeHandlers;
 
     private boolean locked = false;
     private LuaTable globalEnv;
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> TypeHandler<T> getTypeHandler(Class<T> clazz) {
+    public TypeHandler<?> getTypeHandler(Class<?> clazz) {
+        return getTypeHandler(clazz, true);
+    }
+
+    private TypeHandler<?> getTypeHandler(Class<?> clazz, boolean tryInterfaces) {
         Class<?> currentClass = clazz;
         while (currentClass != null) {
             if (typeHandlers.containsKey(currentClass)) {
-                var handler = (TypeHandler<T>) typeHandlers.get(currentClass);
+                var handler = typeHandlers.get(currentClass);
                 typeHandlers.put(clazz, handler);
                 return handler;
             }
             currentClass = currentClass.getSuperclass();
+        }
+
+        GameCore.logger().debug("Did not find handler for {}", clazz.getSimpleName());
+
+        if (!tryInterfaces)
+            return null;
+
+        var interfaces = clazz.getInterfaces();
+        for (var i : interfaces) {
+            GameCore.logger().debug("Trying interface {}", i.getSimpleName());
+            var handler = getTypeHandler(i, false);
+            if (handler != null) {
+                GameCore.logger().debug("Found handler for interface {} ({})", i.getSimpleName(), handler.getTypeClass().getSimpleName());
+                typeHandlers.put(i, handler);
+                return handler;
+            }
         }
 
         return null;
@@ -67,7 +87,6 @@ public final class LuaScriptApi implements LuaApi, ScriptApi {
             return handler.getUserdataOfRaw(obj, instance);
     }
 
-    private final Globals serverGlobals = JsePlatform.standardGlobals();
 
     LuaScriptApi(){}
 

@@ -12,7 +12,7 @@ import java.util.Locale;
 
 public interface LuaApi {
 
-    <T> TypeHandler<T> getTypeHandler(Class<T> clazz);
+    TypeHandler<?> getTypeHandler(Class<?> clazz);
 
     LuaValue getUserdataOf(Object obj);
 
@@ -35,11 +35,13 @@ public interface LuaApi {
     // -# userdataOf
 
     static LuaValue userdataOf(Object o) {
-        return GameCore.luaApi().getUserdataOf(o);
+        LuaValue value = GameCore.luaApi().getUserdataOf(o);
+        return value.isnil() ? valueOf(o) : value;
     }
 
     static LuaValue userdataOf(Object o, Game instance) {
-        return GameCore.luaApi().getUserdataOf(o, instance);
+        LuaValue value = GameCore.luaApi().getUserdataOf(o, instance);
+        return value.isnil() ? valueOf(o) : value;
     }
 
     // -# valueOf
@@ -84,12 +86,22 @@ public interface LuaApi {
         if (o == null)
             return LuaConstant.NIL;
 
-        if (o instanceof Keyed k)
-            return LuaValue.valueOf(k.getKey().asMinimalString().toLowerCase(Locale.ROOT));
+        if (o instanceof LuaValue v)
+            return v;
 
-        if (o instanceof Enum<?> e)
-            return LuaValue.valueOf(e.toString().toLowerCase(Locale.ROOT));
-
-        return userdataOf(o);
+        switch (o) {
+            case Boolean v:     return valueOf(v);
+            case Integer v:     return valueOf(v);
+            case Double v:      return valueOf(v);
+            case Character v:   return valueOf(v);
+            case Float v:       return valueOf(v);
+            case byte[] v:      return valueOf(v);
+            case String v:      return valueOf(v);
+            case Component v:   return valueOf(v);
+            case Keyed v:       return LuaValue.valueOf(v.getKey().asMinimalString().toLowerCase(Locale.ROOT));
+            case Enum<?> v:     return LuaValue.valueOf(v.toString().toLowerCase(Locale.ROOT));
+            default:            return LuaConstant.NIL;
+        }
     }
+
 }
