@@ -48,7 +48,7 @@ public class LocationLib implements LuaLib, TypeHandler<Location> {
     // Location::new(world, x, y, z, yaw, pitch)
     private static Varargs newLocation(Varargs args) {
         return switch (args.narg()) {
-            case 0, 1, 5 -> throw new LuaError("bad argument #" + args.narg() + 1 + "(value expected)");
+            case 0, 1, 5 -> throw new LuaError("bad argument #" + (args.narg() + 1) + "( value expected)");
             case 2 -> userdataOf(createLocation(LuaUtil.toWorld(args.checkjstring(1)), args.arg(2).checkuserdata(Vector3.class)));
             case 4 -> args.isuserdata(2)
                 ? userdataOf(createLocation(LuaUtil.toWorld(args.checkjstring(1)), args.arg(2).checkuserdata(Vector3.class), (float) args.checkdouble(3), (float) args.checkdouble(4)))
@@ -121,12 +121,12 @@ public class LocationLib implements LuaLib, TypeHandler<Location> {
         Object obj = arg2.checkuserdata();
 
         if (obj instanceof Vector3 vec)
-            loc.subtract(vec.x, vec.y, vec.z);
+            loc.add(vec.x, vec.y, vec.z);
         else if (obj instanceof Location loc2)
-            loc.subtract(loc2);
+            loc.add(loc2);
         else {
             double s = arg2.checkdouble();
-            loc.subtract(s, s, s);
+            loc.add(s, s, s);
         }
 
         return userdataOf(loc);
@@ -140,12 +140,12 @@ public class LocationLib implements LuaLib, TypeHandler<Location> {
         Object obj = arg2.checkuserdata();
 
         if (obj instanceof Vector3 vec)
-            loc.add(vec.x, vec.y, vec.z);
+            loc.subtract(vec.x, vec.y, vec.z);
         else if (obj instanceof Location loc2)
-            loc.add(loc2);
+            loc.subtract(loc2);
         else {
             double s = arg2.checkdouble();
-            loc.add(s, s, s);
+            loc.subtract(s, s, s);
         }
 
         return userdataOf(loc);
