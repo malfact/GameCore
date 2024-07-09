@@ -56,8 +56,7 @@ public class GameLib extends EventLib {
         }
     }
 
-    private LuaValue getPlayers(LuaValue self) {
-        Game instance = self.checkuserdata(Game.class);
+    private LuaValue getPlayers() {
         Player[] players = instance.getPlayers();
 
         LuaTable table = new LuaTable();
@@ -69,8 +68,7 @@ public class GameLib extends EventLib {
         return table;
     }
 
-    private LuaValue getEntities(LuaValue self) {
-        Game instance = self.checkuserdata(Game.class);
+    private LuaValue getEntities() {
         Entity[] players = instance.getEntities();
 
         LuaTable table = new LuaTable();
