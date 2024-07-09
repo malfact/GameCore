@@ -120,7 +120,7 @@ public abstract class LuaUtil {
             return tag.call().tojstring();
 
         if (arg.isuserdata())
-            return "userdata";
+            return arg.touserdata().getClass().getSimpleName();
 
         return arg.tojstring();
     }
