@@ -38,8 +38,8 @@ public class WorldLib extends InstancedLib {
         lib.set("getBlockType", func_getBlockType);
         lib.set("getBlockType", func_setBlockType);
         lib.set("playSound",    func_playSound);
-        lib.set("playSound",    func_strikeLightning);
-        lib.set("playSound",    func_strikeLightningEffect);
+        lib.set("strikeLightning", func_strikeLightning);
+        lib.set("strikeLightningEffect", func_strikeLightningEffect);
 
         env.set("World", lib);
     }
