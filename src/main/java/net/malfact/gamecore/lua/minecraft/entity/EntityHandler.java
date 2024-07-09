@@ -68,6 +68,7 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
      */
     protected LuaValue get(Game instance, T entity, String key) {
         return switch (key) {
+            case "registered" ->        LuaConstant.TRUE;
             case "name" ->              LuaApi.valueOf(entity.name());
             case "location" ->          LuaApi.userdataOf(entity.getLocation());
             case "velocity" ->          LuaApi.userdataOf(entity.getVelocity());
@@ -132,6 +133,7 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
      */
     protected LuaValue getUnregistered(T entity, String key) {
         return switch (key) {
+            case "registered" -> LuaConstant.FALSE;
             case "name" -> LuaApi.valueOf(entity.name());
             case "uuid" -> LuaApi.valueOf(entity.getUniqueId().toString());
             case "type" -> LuaApi.userdataOf(entity.getType());
