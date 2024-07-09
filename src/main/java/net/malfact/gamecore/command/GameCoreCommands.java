@@ -9,7 +9,6 @@ import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.executors.ExecutorType;
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.Messages;
-import net.malfact.gamecore.game.Game;
 import net.malfact.gamecore.team.GameTeam;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,101 +22,45 @@ public final class GameCoreCommands {
     public static void register(JavaPlugin plugin) {
 
         new CommandAPICommand("game")
-            .withSubcommand(new CommandAPICommand("join")
+            .withSubcommand(new CommandAPICommand("load")
+                .withPermission("gamecore.game.load")
                 .withArguments(new StringArgument("game"))
-                .executesPlayer((sender, args) -> {
-                    String gameName = args.getUnchecked("game");
-                    Game game = GameCore.getGameManager().getGame(gameName);
-                    if (game == null)
-                        return;
-                    game.joinGame(sender);
-                })
+                .executes(GameCommands::loadGame)
             )
-            .withSubcommand(new CommandAPICommand("leave")
-                .withArguments(new StringArgument("game"))
-                .executesPlayer((sender, args) -> {
-                    String gameName = args.getUnchecked("game");
-                    Game game = GameCore.getGameManager().getGame(gameName);
-                    if (game == null)
-                        return;
-                    game.leaveGame(sender);
-                })
-            ).withSubcommand(new CommandAPICommand("load")
-                .withArguments(new StringArgument("game"))
-                .executes((sender, args) -> {
-                    String name = args.getUnchecked("game");
-//                    var manager = GameCore.getScriptManager();
-                    // TODO: Fix
-//                    if (!manager.preloadGameScript(name) || !manager.loadGameScript(name)) {
-//                        sender.sendMessage("Script " + name + ".lua does not exist!");
-//                        return;
-//                    }
-
-                    sender.sendMessage("Script " + name + ".lua loaded!");
-                })
-            ).withSubcommand(new CommandAPICommand("unload")
-                .withArguments(new StringArgument("game"))
-                .executes((sender, args) -> {
-                    String name = args.getUnchecked("game");
-                    Game game = GameCore.getGameManager().getGame(name);
-                    if (game == null) {
-                        sender.sendMessage(name + " does not exists!");
-                        return;
-                    }
-                    GameCore.getGameManager().unregisterGame(name);
-                    sender.sendMessage("Script " + name + ".lua unloaded!");
-                })
-            ).withSubcommand(new CommandAPICommand("state")
-                .withArguments(new StringArgument("game"))
-                .executes((sender, args) -> {
-                    String gameName = args.getUnchecked("game");
-                    Game game = GameCore.getGameManager().getGame(gameName);
-                    if (game == null) {
-                        sender.sendMessage(gameName + " does not exists!");
-                        return;
-                    }
-                    sender.sendMessage(game.getName() + " is " + game.getState());
-                })
+            .withSubcommand(new CommandAPICommand("unload")
+                .withPermission("gamecore.game.unload")
+                .withArguments(Arguments.Game("game"))
+                .executes(GameCommands::unloadGame)
             )
             .withSubcommand(new CommandAPICommand("reload")
-                .withArguments(new StringArgument("game"))
-                .executes((sender, args) -> {
-                    String gameName = args.getUnchecked("game");
-                    Game game = GameCore.getGameManager().getGame(gameName);
-                    if (game == null) {
-                        sender.sendMessage(gameName + " does not exists!");
-                        return;
-                    }
-                    sender.sendMessage("Reloading " + game.getName() + "...");
-                    game.reload();
-                    sender.sendMessage(game.getName() + " reloaded!");
-                })
+                .withPermission("gamecore.game.reload")
+                .withArguments(Arguments.Game("game"))
+                .executes(GameCommands::reloadGame)
             )
             .withSubcommand(new CommandAPICommand("start")
-                .withArguments(new StringArgument("game"))
-                .executes((sender, args) -> {
-                    String gameName = args.getUnchecked("game");
-                    Game game = GameCore.getGameManager().getGame(gameName);
-                    if (game == null) {
-                        sender.sendMessage(gameName + " does not exists!");
-                        return;
-                    }
-                    sender.sendMessage("Starting " + game.getName() + "...");
-                    game.start();
-                })
+                .withPermission("gamecore.game.start")
+                .withArguments(Arguments.Game("game"))
+                .executes(GameCommands::startGame)
             )
             .withSubcommand(new CommandAPICommand("stop")
-                .withArguments(new StringArgument("game"))
-                .executes((sender, args) -> {
-                    String gameName = args.getUnchecked("game");
-                    Game game = GameCore.getGameManager().getGame(gameName);
-                    if (game == null) {
-                        sender.sendMessage(gameName + " does not exists!");
-                        return;
-                    }
-                    sender.sendMessage("Stopping " + game.getName() + "...");
-                    game.stop();
-                })
+                .withPermission("gamecore.game.stop")
+                .withArguments(Arguments.Game("game"))
+                .executes(GameCommands::stopGame)
+            )
+            .withSubcommand(new CommandAPICommand("join")
+                .withPermission("gamecore.game.join")
+                .withArguments(Arguments.Game("game"))
+                .withOptionalArguments(new EntitySelectorArgument.ManyPlayers("player")
+                    .withPermission("gamecore.queue.join.other")
+                )
+                .executes(GameCommands::joinGame)
+            )
+            .withSubcommand(new CommandAPICommand("leave")
+                .withPermission("gamecore.game.leave")
+                .withOptionalArguments(new EntitySelectorArgument.ManyPlayers("player")
+                    .withPermission("gamecore.queue.join.other")
+                )
+                .executes(GameCommands::leaveGame)
             )
             .register(plugin);
 
