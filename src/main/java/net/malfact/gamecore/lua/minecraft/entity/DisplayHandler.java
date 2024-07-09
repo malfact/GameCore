@@ -109,4 +109,9 @@ public class DisplayHandler<T extends Display> extends EntityHandler<T> {
             return varargsOf(new LuaValue[]{vec3Translation, leftRot, vec3Scale, rightRot});
         }
     }
+
+    @Override
+    protected String type() {
+        return "display";
+    }
 }

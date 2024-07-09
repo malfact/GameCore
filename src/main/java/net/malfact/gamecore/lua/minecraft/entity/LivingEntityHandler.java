@@ -79,8 +79,8 @@ public class LivingEntityHandler<T extends LivingEntity> extends EntityHandler<T
     }
 
     @Override
-    protected String toString(T entity) {
-        return "living_entity<" + entity.getType().getKey().asMinimalString() + ">";
+    protected String type() {
+        return "living_entity";
     }
 
     private LuaValue addPotionEffect(Varargs args) {

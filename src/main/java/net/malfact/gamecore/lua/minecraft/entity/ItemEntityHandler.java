@@ -44,4 +44,9 @@ public class ItemEntityHandler extends EntityHandler<Item> {
             default -> super.set(instance, item, key, value);
         };
     }
+
+    @Override
+    protected String type() {
+        return "item";
+    }
 }

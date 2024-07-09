@@ -76,6 +76,11 @@ public class HumanEntityHandler<T extends HumanEntity> extends LivingEntityHandl
         }
     }
 
+    @Override
+    protected String type() {
+        return "human_entity";
+    }
+
     private LuaValue hasCooldown(LuaValue arg1, LuaValue arg2) {
         HumanEntity entity = arg1.checkuserdata(HumanEntity.class);
         Material material = LuaUtil.checkMaterial(arg2);

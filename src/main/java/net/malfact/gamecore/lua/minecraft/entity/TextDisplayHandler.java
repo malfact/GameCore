@@ -42,6 +42,10 @@ public class TextDisplayHandler extends DisplayHandler<TextDisplay> {
 
             default -> super.set(instance, display, key, value);
         }
+    }
 
+    @Override
+    protected String type() {
+        return "text_display";
     }
 }

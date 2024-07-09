@@ -159,6 +159,16 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
     }
 
     @Override
+    protected LuaValue getUnregistered(Player player, String key) {
+        if (key.equals("isOnline"))
+            return LuaApi.valueOf(player.isOnline());
+        else if (key.equals("gamemode"))
+            return LuaApi.valueOf(player.getGameMode());
+        else
+            return super.getUnregistered(player, key);
+    }
+
+    @Override
     protected String toString(Player player) {
         return LuaUtil.fromComponent(player.name());
     }

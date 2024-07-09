@@ -9,15 +9,16 @@ import net.malfact.gamecore.lua.Vector3Lib;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.luaj.vm2.LuaConstant;
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaUserdata;
-import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.*;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 
 public class EntityHandler<T extends Entity> implements TypeHandler<T> {
+
+    private final LuaFunction func_indexUnregistered =  LuaUtil.toFunction(this::onIndexUnregistered);
+    private final LuaFunction func_tostring =           LuaUtil.toFunction(this::onToString);
+    private final LuaFunction func_equals =             LuaUtil.toFunction(this::onEquals);
 
     private final Class<T> entityClass;
 
@@ -31,26 +32,40 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
     }
 
     @Override
-    public final LuaValue getUserdataOf(T object) {
-        return LuaApi.valueOf(object.getName());
+    public final LuaValue getUserdataOf(T entity) {
+        LuaTable meta = new LuaTable();
+        meta.set(LuaConstant.MetaTag.INDEX,     func_indexUnregistered);
+        meta.set(LuaConstant.MetaTag.TOSTRING,  func_tostring);
+        meta.set(LuaConstant.MetaTag.EQ,        func_equals);
+
+        meta.set("__userdata_type__", "unregistered<" + type() + ">");
+
+        return new LuaUserdata(entity, meta);
     }
 
     @Override
-    public final LuaValue getUserdataOf(T object, Game instance) {
+    public final LuaValue getUserdataOf(T entity, Game instance) {
         LuaTable meta = new LuaTable();
 
-        meta.set(LuaConstant.MetaTag.INDEX, new InstancedGet<>(this, instance));
-        meta.set(LuaConstant.MetaTag.NEWINDEX, new InstancedSet<>(this, instance));
-        meta.set(LuaConstant.MetaTag.TOSTRING, LuaUtil.toFunction(this::onToString));
-        meta.set(LuaConstant.MetaTag.EQ, LuaUtil.toFunction(this::onEquals));
+        meta.set(LuaConstant.MetaTag.INDEX,     new InstancedGet<>(this, instance));
+        meta.set(LuaConstant.MetaTag.NEWINDEX,  new InstancedSet<>(this, instance));
+        meta.set(LuaConstant.MetaTag.TOSTRING,  func_tostring);
+        meta.set(LuaConstant.MetaTag.EQ,        func_equals);
 
         meta.set("__userdata_type__", type());
 
         meta.set(LuaConstant.MetaTag.METATABLE, LuaConstant.FALSE);
 
-        return new LuaUserdata(object, meta);
+        return new LuaUserdata(entity, meta);
     }
 
+    /**
+     * Get the {@code value} of the {@code entity} registered with {@code instance}.
+     * @param instance the instance
+     * @param entity the entity
+     * @param key the key of the value
+     * @return the {@code value} or {@code nil}
+     */
     protected LuaValue get(Game instance, T entity, String key) {
         return switch (key) {
             case "name" ->              LuaApi.valueOf(entity.name());
@@ -70,7 +85,7 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
             case "customName" ->        LuaApi.valueOf(entity.customName());
             case "customNameVisible" -> LuaApi.valueOf(entity.isCustomNameVisible());
 
-            case "type" ->              LuaApi.valueOf(entity.getType().getKey());
+            case "type" ->              LuaApi.userdataOf(entity.getType());
             case "onGround" ->          LuaApi.valueOf(entity.isOnGround());
             case "underWater" ->        LuaApi.valueOf(entity.isUnderWater());
             case "inWater" ->           LuaApi.valueOf(entity.isInWater());
@@ -83,6 +98,13 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
         };
     }
 
+    /**
+     * Set the {@code value} of the {@code entity} registered with {@code instance}.
+     * @param instance the instance
+     * @param entity the entity
+     * @param key the key of the value
+     * @param value the value or {@code nil}
+     */
     protected void set(Game instance, T entity, String key, LuaValue value) {
         switch (key) {
             case "location" ->          entity.teleport(LuaUtil.checkLocation(value));
@@ -102,26 +124,63 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
         }
     }
 
-    protected String toString(T entity) {
-        return "entity<" + entity.getType().getKey().asMinimalString() + ">";
+    /**
+     * Get the {@code value} of the {@code entity} not registered with an instance.
+     * @param entity the entity
+     * @param key the key of the value
+     * @return the {@code value} or {@code nil}
+     */
+    protected LuaValue getUnregistered(T entity, String key) {
+        return switch (key) {
+            case "name" -> LuaApi.valueOf(entity.name());
+            case "uuid" -> LuaApi.valueOf(entity.getUniqueId().toString());
+            case "type" -> LuaApi.userdataOf(entity.getType());
+
+            default -> LuaConstant.NIL;
+        };
     }
 
+    /**
+     * Get the {@code entity} converted to a {@code string}.
+     * @param entity the entity
+     * @return the {@code string} form of the entity.
+     */
+    protected String toString(T entity) {
+        return entity.getType().getKey().asMinimalString();
+    }
+
+    /**
+     * The type of the entity for use with meta tag {@code __userdata_type__}.
+     * @return the {@code __userdata_type__} string
+     */
     protected String type() {
         return "entity";
     }
 
+    // __eq
     private LuaValue onEquals(LuaValue self, LuaValue other) {
         T entity = self.checkuserdata(entityClass);
-        if (other.isnil() || other.isuserdata(entityClass))
+        if (other.isnil() || !other.isuserdata(entityClass))
             return LuaConstant.FALSE;
 
         return LuaValue.valueOf(entity.getUniqueId().equals(other.touserdata(entityClass).getUniqueId()));
     }
 
+    // __tostring
     private LuaValue onToString(LuaValue self) {
         return LuaValue.valueOf(toString(self.checkuserdata(entityClass)));
     }
 
+    // unregistered: __index
+    private LuaValue onIndexUnregistered(LuaValue arg1, LuaValue arg2) {
+        T entity = arg1.checkuserdata(entityClass);
+        if (!arg2.isstring())
+            return LuaConstant.NIL;
+
+        return getUnregistered(entity, arg2.tojstring());
+    }
+
+    // registered: __index
     private static class InstancedGet<T extends Entity> extends TwoArgFunction {
         private final Game instance;
         private final EntityHandler<T> handler;
@@ -141,6 +200,7 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
         }
     }
 
+    // registered: __newindex
     private static class InstancedSet<T extends Entity> extends ThreeArgFunction {
 
         private final Game instance;
