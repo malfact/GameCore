@@ -331,7 +331,7 @@ public class EventRegistry {
 
             listeners.add(listener);
             Bukkit.getPluginManager().registerEvent(eventClass, listener, EventPriority.NORMAL, listener, GameCore.getInstance());
-            GameCore.logDebug("Registered Listener for " + eventClass.getSimpleName());
+            GameCore.logger().debug("Registered Listener for {}", eventClass.getSimpleName());
         }
 
         public void unregisterListener(GameListener listener) {
@@ -348,7 +348,7 @@ public class EventRegistry {
                 throw new RuntimeException(e);
             }
 
-            GameCore.logDebug("Unregistered Listener for " + eventClass.getSimpleName());
+            GameCore.logger().debug("Unregistered Listener for {}", eventClass.getSimpleName());
         }
     }
 }
