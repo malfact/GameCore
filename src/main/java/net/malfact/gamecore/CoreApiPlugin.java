@@ -107,9 +107,7 @@ class CoreApiPlugin implements Listener {
         event.registerTypeHandler(new DamageSourceHandler(), DamageSource.class, CraftClass.forName("damage.CraftDamageSource"));
         event.registerTypeHandler(new EventHandler(), Event.class);
 
-        var bossBarLib = new BossBarLib();
-        event.registerLib(bossBarLib);
-        event.registerTypeHandler(bossBarLib, BossBar.class, CraftClass.forName("boss.CraftBossBar"));
+        event.registerTypeHandler(BossBarLib.HANDLER, BossBar.class, CraftClass.forName("boss.CraftBossBar"));
     }
 
     @org.bukkit.event.EventHandler
@@ -121,6 +119,7 @@ class CoreApiPlugin implements Listener {
         event.registerLib(new WorldLib(instance));
         event.registerLib(new EntityLib(instance));
         event.registerLib(new PlayerLib(instance));
+        event.registerLib(new BossBarLib(instance));
     }
 }
 
