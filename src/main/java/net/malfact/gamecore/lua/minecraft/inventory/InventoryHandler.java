@@ -92,7 +92,7 @@ public class InventoryHandler<I extends Inventory> implements TypeHandler<I> {
      */
     protected LuaValue get(Game instance, I self, int index) {
         ItemStack item = self.getItem(index);
-        if (item.isEmpty())
+        if (item == null || item.isEmpty())
             return LuaConstant.NIL;
 
         return LuaApi.userdataOf(item);
@@ -131,7 +131,7 @@ public class InventoryHandler<I extends Inventory> implements TypeHandler<I> {
     }
 
     protected String toString(I self) {
-        return self.getType().toString().toLowerCase(Locale.ROOT);
+        return self.getType().toString().toLowerCase(Locale.ROOT) + "_inventory";
     }
 
     protected int size(I self) {
@@ -163,17 +163,17 @@ public class InventoryHandler<I extends Inventory> implements TypeHandler<I> {
     // Index outside [1, self.size] returns nil
     private LuaValue onIndex(LuaValue arg1, LuaValue arg2) {
         I self = arg1.checkuserdata(inventoryClass);
-        Game instance = arg1.getmetatable().get("instance").checkuserdata(Game.class);
+//        Game instance = arg1.getmetatable().get("instance").checkuserdata(Game.class);
 
-        if (arg2.isstring())
-            return get(instance, self, arg2.tojstring());
-        else if (arg2.isint()) {
-            int index = arg2.toint() - 1;
-            if (index < 0 || index >= size(self))
+        if (arg2.isint()) {
+            int index = arg2.toint();
+            if (index < 1 || index > size(self))
                 return LuaConstant.NIL;
 
-            return get(instance, self, index);
-        } else
+            return get(null, self, index - 1);
+        } else if (arg2.isstring())
+            return get(null, self, arg2.tojstring());
+        else
             return LuaConstant.NIL;
     }
 
@@ -181,17 +181,16 @@ public class InventoryHandler<I extends Inventory> implements TypeHandler<I> {
     // Index outside [1, self.size] is ignored
     private void onNewIndex(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
         I self = arg1.checkuserdata(inventoryClass);
-        Game instance = arg1.getmetatable().get("instance").checkuserdata(Game.class);
+//        Game instance = arg1.getmetatable().get("instance").checkuserdata(Game.class);
 
-        if (arg2.isstring())
-            set(instance, self, arg2.tojstring(), arg3);
-        else if (arg2.isint()) {
-            int index = arg2.toint() - 1;
-            if (index < 0 || index >= size(self))
+        if (arg2.isint()) {
+            int index = arg2.toint();
+            if (index < 1 || index > size(self))
                 return;
 
-            set(instance, self, index, arg3);
-        }
+            set(null, self, index - 1, arg3);
+        } else if (arg2.isstring())
+            set(null, self, arg2.tojstring(), arg3);
     }
 
     // __tostring(self)

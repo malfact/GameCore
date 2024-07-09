@@ -385,8 +385,7 @@ public abstract class LuaUtil {
 
     @NotNull
     public static Component toComponent(String value) {
-        var c = MiniMessage.miniMessage().deserialize(value);
-        return c;
+        return MiniMessage.miniMessage().deserialize(value);
     }
 
     @Nullable
@@ -394,7 +393,7 @@ public abstract class LuaUtil {
         if (value.isnil())
             return null;
 
-        return MiniMessage.miniMessage().deserialize(value.tojstring());
+        return MiniMessage.miniMessage().deserialize(toString(value));
     }
 
     @NotNull

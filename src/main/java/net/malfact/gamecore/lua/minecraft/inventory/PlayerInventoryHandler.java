@@ -7,12 +7,6 @@ import org.luaj.vm2.LuaValue;
 
 public class PlayerInventoryHandler extends InventoryHandler<PlayerInventory> {
 
-    private static final PlayerInventoryHandler INSTANCE = new PlayerInventoryHandler();
-
-    public static PlayerInventoryHandler Get() {
-        return INSTANCE;
-    }
-
     public PlayerInventoryHandler() {
         super(PlayerInventory.class);
     }
@@ -21,7 +15,7 @@ public class PlayerInventoryHandler extends InventoryHandler<PlayerInventory> {
     protected LuaValue get(Game instance, PlayerInventory self, String key) {
         return switch (key) {
             case "mainHand" ->      LuaApi.userdataOf(self.getItemInMainHand());
-            case "offhand" ->       LuaApi.userdataOf(self.getItemInOffHand());
+            case "offHand" ->       LuaApi.userdataOf(self.getItemInOffHand());
             case "heldItemSlot" ->  LuaApi.valueOf(self.getHeldItemSlot() + 1);
             case "head",
                  "helmet" ->        LuaApi.userdataOf(self.getHelmet());
