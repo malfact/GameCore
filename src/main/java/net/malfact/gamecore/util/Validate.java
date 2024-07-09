@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 
 public class Validate {
 
+
+
     public static GamePlayer isGamePlayer(Player player) {
         GamePlayer gamePlayer = GameCore.getPlayerManager().getPlayer(player);
 

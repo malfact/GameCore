@@ -35,7 +35,10 @@ public final class RegisterGlobalLibraryEvent extends Event {
         libs.add(lib);
     }
 
-    public <T> void registerTypeHandler(TypeHandler<T> handler, Class<T> typeClass) {
+    public void registerTypeHandler(TypeHandler<?> handler, Class<?> typeClass, Class<?>... others) {
         handlers.put(typeClass, handler);
+        for (var other : others) {
+            handlers.put(other, handler);
+        }
     }
 }

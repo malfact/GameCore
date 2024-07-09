@@ -13,6 +13,7 @@ import net.malfact.gamecore.lua.minecraft.entity.*;
 import net.malfact.gamecore.lua.minecraft.inventory.InventoryHandler;
 import net.malfact.gamecore.lua.minecraft.inventory.PlayerInventoryHandler;
 import net.malfact.gamecore.lua.minecraft.types.*;
+import net.malfact.gamecore.util.CraftClass;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -49,15 +50,15 @@ class CoreApiPlugin implements Listener {
 
         var itemStackLib = new ItemStackLib();
         event.registerLib(itemStackLib);
-        event.registerTypeHandler(itemStackLib, ItemStack.class);
+        event.registerTypeHandler(itemStackLib, ItemStack.class, CraftClass.forName("inventory.CraftItemStack"));
 
         var itemMetaLib = new ItemMetaLib();
         event.registerLib(itemMetaLib);
-        event.registerTypeHandler(itemMetaLib, ItemMeta.class);
+        event.registerTypeHandler(itemMetaLib, ItemMeta.class, CraftClass.forName("inventory.CraftMetaItem"));
 
         var attributeLib = new AttributeLib();
         event.registerLib(attributeLib);
-        event.registerTypeHandler(attributeLib, AttributeInstance.class);
+        event.registerTypeHandler(attributeLib, AttributeInstance.class, CraftClass.forName("attribute.CraftAttributeInstance"));
 
         var attributeModifierLib = new AttributeModifierLib();
         event.registerLib(attributeModifierLib);
@@ -91,24 +92,24 @@ class CoreApiPlugin implements Listener {
         event.registerLib(inventoryTypeLib);
         event.registerTypeHandler(inventoryTypeLib, InventoryType.class);
 
-        event.registerTypeHandler(new EntityHandler<>(Entity.class), Entity.class);
-        event.registerTypeHandler(new LivingEntityHandler<>(LivingEntity.class), LivingEntity.class);
-        event.registerTypeHandler(new HumanEntityHandler<>(HumanEntity.class), HumanEntity.class);
-        event.registerTypeHandler(new PlayerHandler(), Player.class);
-        event.registerTypeHandler(new ItemEntityHandler(), Item.class);
-        event.registerTypeHandler(new DisplayHandler<>(Display.class), Display.class);
-        event.registerTypeHandler(new TextDisplayHandler(), TextDisplay.class);
+        event.registerTypeHandler(new EntityHandler<>(Entity.class), Entity.class, CraftClass.forName("entity.CraftEntity"));
+        event.registerTypeHandler(new LivingEntityHandler<>(LivingEntity.class), LivingEntity.class, CraftClass.forName("entity.CraftLivingEntity"));
+        event.registerTypeHandler(new HumanEntityHandler<>(HumanEntity.class), HumanEntity.class, CraftClass.forName("entity.CraftHumanEntity"));
+        event.registerTypeHandler(new PlayerHandler(), Player.class, CraftClass.forName("entity.CraftPlayer"));
+        event.registerTypeHandler(new ItemEntityHandler(), Item.class, CraftClass.forName("entity.CraftItem"));
+        event.registerTypeHandler(new DisplayHandler<>(Display.class), Display.class, CraftClass.forName("entity.CraftDisplay"));
+        event.registerTypeHandler(new TextDisplayHandler(), TextDisplay.class, CraftClass.forName("entity.CraftTextDisplay"));
 
-        event.registerTypeHandler(new InventoryHandler<>(Inventory.class), Inventory.class);
-        event.registerTypeHandler(new PlayerInventoryHandler(), PlayerInventory.class);
+        event.registerTypeHandler(new InventoryHandler<>(Inventory.class), Inventory.class, CraftClass.forName("inventory.CraftInventory"));
+        event.registerTypeHandler(new PlayerInventoryHandler(), PlayerInventory.class, CraftClass.forName("entity.CraftPlayer"));
 
         //noinspection UnstableApiUsage
-        event.registerTypeHandler(new DamageSourceHandler(), DamageSource.class);
+        event.registerTypeHandler(new DamageSourceHandler(), DamageSource.class, CraftClass.forName("damage.CraftDamageSource"));
         event.registerTypeHandler(new EventHandler(), Event.class);
 
         var bossBarLib = new BossBarLib();
         event.registerLib(bossBarLib);
-        event.registerTypeHandler(bossBarLib, BossBar.class);
+        event.registerTypeHandler(bossBarLib, BossBar.class, CraftClass.forName("boss.CraftBossBar"));
     }
 
     @org.bukkit.event.EventHandler

@@ -31,10 +31,6 @@ public final class LuaScriptApi implements LuaApi, ScriptApi {
 
     @Override
     public TypeHandler<?> getTypeHandler(Class<?> clazz) {
-        return getTypeHandler(clazz, true);
-    }
-
-    private TypeHandler<?> getTypeHandler(Class<?> clazz, boolean tryInterfaces) {
         Class<?> currentClass = clazz;
         while (currentClass != null) {
             if (typeHandlers.containsKey(currentClass)) {
@@ -47,22 +43,9 @@ public final class LuaScriptApi implements LuaApi, ScriptApi {
 
         GameCore.logger().debug("Did not find handler for {}", clazz.getSimpleName());
 
-        if (!tryInterfaces)
-            return null;
-
-        var interfaces = clazz.getInterfaces();
-        for (var i : interfaces) {
-            GameCore.logger().debug("Trying interface {}", i.getSimpleName());
-            var handler = getTypeHandler(i, false);
-            if (handler != null) {
-                GameCore.logger().debug("Found handler for interface {} ({})", i.getSimpleName(), handler.getTypeClass().getSimpleName());
-                typeHandlers.put(i, handler);
-                return handler;
-            }
-        }
-
         return null;
     }
+
 
     @Override
     public LuaValue getUserdataOf(Object obj) {
