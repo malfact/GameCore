@@ -2,6 +2,8 @@ package net.malfact.gamecore.lua.minecraft.entity;
 
 import io.papermc.paper.entity.LookAnchor;
 import io.papermc.paper.math.Position;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import net.kyori.adventure.util.TriState;
 import net.malfact.gamecore.Vector3;
 import net.malfact.gamecore.api.LuaApi;
@@ -27,7 +29,7 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
     private final LuaFunction func_giveExp =                    LuaUtil.toFunction(this::giveExp);
     private final LuaFunction func_giveExpLevels =              LuaUtil.toFunction(this::giveExpLevels);
     private final LuaFunction func_canSee =                     LuaUtil.toFunction(this::canSee);
-    private final LuaFunction func_showTitle =                  LuaUtil.toVarargFunction(this::showTitle);
+    private final LuaFunction func_showTitle =                  LuaUtil.toFunction(this::showTitle);
     private final LuaFunction func_resetTitle =                 LuaUtil.toFunction(this::resetTitle);
     private final LuaFunction func_spawnParticle =              LuaUtil.toVarargFunction(this::spawnParticle);
     private final LuaFunction func_getCooledAttackStrength =    LuaUtil.toFunction(this::getCooledAttackStrength);
@@ -259,8 +261,12 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
         return LuaValue.valueOf(arg1.checkuserdata(Player.class).canSee(arg2.checkuserdata(Entity.class)));
     }
 
-    private void showTitle(Varargs args) {
-        args.arg1().checkuserdata(Player.class).sendMessage(LuaUtil.toComponent(LuaUtil.toString(args.subargs(2))));
+    private void showTitle(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
+        Player player = arg1.checkuserdata(Player.class);
+        Component title = LuaUtil.toComponent(arg2);
+        Component subtitle = LuaUtil.toComponent(arg3.optjstring(""));
+
+        player.showTitle(Title.title(title, subtitle));
     }
 
     private void resetTitle(LuaValue arg) {
