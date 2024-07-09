@@ -18,7 +18,7 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
 
     private final LuaFunction func_sendMessageRaw =             LuaUtil.toVarargFunction(this::sendMessageRaw);
     private final LuaFunction func_sendMessage =                LuaUtil.toVarargFunction(this::sendMessage);
-    private final LuaFunction func_sendActionBar =              LuaUtil.toFunction(this::sendActionBar);
+    private final LuaFunction func_sendActionBar =              LuaUtil.toVarargFunction(this::sendActionBar);
     private final LuaFunction func_setTime =                    LuaUtil.toFunction(this::setTime);
     private final LuaFunction func_getTime =                    LuaUtil.toFunction(this::getTime);
     private final LuaFunction func_setTimeOffset =              LuaUtil.toFunction(this::getTimeOffset);
@@ -225,7 +225,9 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
     }
 
     private void sendActionBar(Varargs args) {
-        args.arg1().checkuserdata(Player.class).sendActionBar(LuaUtil.toComponent(LuaUtil.toString(args.subargs(2))));
+        Player player = args.arg(1).checkuserdata(Player.class);
+        String msg = LuaUtil.toString(args.subargs(2));
+        player.sendActionBar(LuaUtil.toComponent(msg));
     }
 
     private void setTime(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
