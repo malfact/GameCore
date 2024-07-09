@@ -182,7 +182,7 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
 
         Location location = LuaUtil.toLocation(args.arg(2));
         if (location == null) {
-            var entity = args.arg1().touserdata(Entity.class);
+            var entity = args.arg(2).touserdata(Entity.class);
             if (entity == null) {
                 location = player.getLocation();
                 o = -1;
