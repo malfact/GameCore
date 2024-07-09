@@ -85,6 +85,7 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
             case "walkspeed" -> LuaValue.valueOf(player.getWalkSpeed());
             case "cooldownPeriod" -> LuaValue.valueOf(player.getCooldownPeriod());
             case "idleDuration" -> LuaValue.valueOf(player.getIdleDuration().toSeconds());
+            case "inventory" -> LuaApi.userdataOf(player.getInventory(), instance);
 
             // Functions
             case "sendMessageRaw" ->          func_sendMessageRaw;
