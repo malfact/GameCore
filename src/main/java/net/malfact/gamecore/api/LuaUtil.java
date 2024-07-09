@@ -332,17 +332,16 @@ public abstract class LuaUtil {
 
     @Nullable
     public static Location toLocation(LuaValue value) {
-        if (value.isnil())
+        if (value.isnil() || !value.isuserdata())
             return null;
 
-        Object o = value.checkuserdata();
-        if (o instanceof Location location)
-            return location;
-        else if (o instanceof Vector3 vec) {
-            return Vector3Lib.toLocation(vec, Bukkit.getWorlds().getFirst());
-        }
+        Object o = value.touserdata();
+        return switch (o) {
+            case Location location -> location;
+            case Vector3 vec -> Vector3Lib.toLocation(vec, Bukkit.getWorlds().getFirst());
+            default -> null;
+        };
 
-        return null;
     }
 
     @NotNull
