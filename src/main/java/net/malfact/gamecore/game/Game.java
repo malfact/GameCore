@@ -1,5 +1,7 @@
 package net.malfact.gamecore.game;
 
+import io.papermc.paper.event.player.PlayerNameEntityEvent;
+import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.event.*;
 import org.bukkit.Bukkit;
@@ -8,8 +10,12 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityEvent;
+import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.vehicle.VehicleEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -291,15 +297,18 @@ public abstract class Game {
      * Helper method for event dispatching
      */
     public final boolean acceptsEvent(Event event) {
-        if (event instanceof PlayerEvent playerEvent) {
-            return hasPlayer(playerEvent.getPlayer());
-        } else if (event instanceof EntityEvent entityEvent) {
-            return hasEntity(entityEvent.getEntity());
-        } else if (event instanceof VehicleEvent vehicleEvent) {
-            return hasEntity(vehicleEvent.getVehicle());
-        }
-
-        return true;
+        return switch (event) {
+            case PlayerInteractEntityEvent e -> hasPlayer(e.getPlayer()) || hasEntity(e.getRightClicked());
+            case PlayerShearEntityEvent e ->    hasPlayer(e.getPlayer()) || hasEntity(e.getEntity());
+            case PlayerLeashEntityEvent e ->    hasPlayer(e.getPlayer()) || hasEntity(e.getEntity());
+            case PlayerNameEntityEvent e ->     hasPlayer(e.getPlayer()) || hasEntity(e.getEntity());
+            case PrePlayerAttackEntityEvent e -> hasPlayer(e.getPlayer()) || hasEntity(e.getAttacked());
+            case EntityDamageByEntityEvent e -> hasEntity(e.getEntity()) || hasEntity(e.getDamager());
+            case PlayerEvent e ->               hasPlayer(e.getPlayer());
+            case EntityEvent e ->               hasEntity(e.getEntity());
+            case VehicleEvent e ->              hasEntity(e.getVehicle());
+            default -> true;
+        };
     }
 
     /* ---- --------- ---- */
