@@ -63,13 +63,13 @@ public class BossBarLib implements LuaLib {
         }
 
         @Override
-        public LuaValue getUserdataOf(BossBar bossbar, Game instance) {
+        public LuaValue getUserdataOf(BossBar bossbar) {
             LuaTable meta = new LuaTable();
 
             meta.set(LuaConstant.MetaTag.INDEX, func_index);
             meta.set(LuaConstant.MetaTag.NEWINDEX, func_newindex);
             meta.set(LuaConstant.MetaTag.TOSTRING, func_tostring);
-            meta.set("__userdata_type__", "vector3");
+            meta.set("__userdata_type__", "boss_bar");
             meta.set(LuaConstant.MetaTag.METATABLE, LuaConstant.FALSE);
 
             return new LuaUserdata(bossbar, meta);
