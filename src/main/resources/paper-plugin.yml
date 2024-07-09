@@ -3,7 +3,7 @@ version: ${version}
 authors:
   - malfact
 main: net.malfact.gamecore.GameCore
-api-version: '1.20'
+api-version: '1.21'
 dependencies:
   server:
     CommandAPI:
@@ -25,11 +25,31 @@ permissions:
       gamecore.save: true
       gamecore.queue.admin: true
       gamecore.team.admin: true
+      gamecore.game.admin: true
   gamecore.player:
     default: false
     children:
       gamecore.queue.player: true
       gamecore.team.player: true
+      gamecore.game.player: true
+  gamecore.game.*:
+    default: op
+    children:
+      gamecore.game.admin: true
+      gamecore.game.player: true
+  gamecore.game.admin:
+    default: false
+    children:
+      gamecore.game.load: true
+      gamecore.game.unload: true
+      gamecore.game.reload: true
+      gamecore.game.start: true
+      gamecore.game.stop: true
+  gamecore.game.player:
+    default: false
+    children:
+      gamecore.game.join: true
+      gamecore.game.leave: true
   gamecore.queue.*:
     default: op
     children:
