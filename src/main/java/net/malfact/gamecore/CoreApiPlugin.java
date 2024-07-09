@@ -101,7 +101,7 @@ class CoreApiPlugin implements Listener {
         event.registerTypeHandler(new TextDisplayHandler(), TextDisplay.class, CraftClass.forName("entity.CraftTextDisplay"));
 
         event.registerTypeHandler(new InventoryHandler<>(Inventory.class), Inventory.class, CraftClass.forName("inventory.CraftInventory"));
-        event.registerTypeHandler(new PlayerInventoryHandler(), PlayerInventory.class, CraftClass.forName("entity.CraftPlayer"));
+        event.registerTypeHandler(new PlayerInventoryHandler(), PlayerInventory.class, CraftClass.forName("inventory.CraftPlayerInventory"));
 
         //noinspection UnstableApiUsage
         event.registerTypeHandler(new DamageSourceHandler(), DamageSource.class, CraftClass.forName("damage.CraftDamageSource"));
