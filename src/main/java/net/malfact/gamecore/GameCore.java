@@ -2,13 +2,15 @@ package net.malfact.gamecore;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import net.malfact.gamecore.api.LuaApi;
+import net.malfact.gamecore.api.ScriptApi;
 import net.malfact.gamecore.command.GameCoreCommands;
 import net.malfact.gamecore.config.ConfigUpdater;
 import net.malfact.gamecore.game.GameManager;
+import net.malfact.gamecore.game.ScriptedGame;
 import net.malfact.gamecore.placeholder.GameCoreExpansion;
 import net.malfact.gamecore.player.PlayerManager;
 import net.malfact.gamecore.queue.QueueManager;
-import net.malfact.gamecore.script.ScriptManager;
 import net.malfact.gamecore.team.TeamManager;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,12 +18,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 public final class GameCore extends JavaPlugin {
 
     public static final String queuePrefix = "gamecore.queue.";
-//    private static final Logger log = LoggerFactory.getLogger(GameCore.class);
     public static boolean tagPlayers = true;
     private boolean debug = false;
 
@@ -34,8 +38,9 @@ public final class GameCore extends JavaPlugin {
     private TeamManager teamManager;
     private PlayerManager playerManager;
     private GameManager gameManager;
-    private ScriptManager scriptManager;
     private DataManager dataManager;
+
+    private LuaScriptApi luaApi;
 
     @Override
     public void onLoad() {
@@ -82,7 +87,6 @@ public final class GameCore extends JavaPlugin {
         // --- Load Game Managers ---
         queueManager = new QueueManager(this);
         teamManager = new TeamManager(this);
-        scriptManager = new ScriptManager(this);
         playerManager = new PlayerManager(this);
         gameManager = new GameManager(this);
         dataManager = new DataManager(this);
@@ -93,8 +97,8 @@ public final class GameCore extends JavaPlugin {
         // --- *------------------------* ---
         // Load Scripts after all plugins enabled
         getServer().getScheduler().scheduleSyncDelayedTask(this, this::postEnable);
-        getServer().getPluginManager().registerEvents(new TestListener(), this);
 
+        getServer().getPluginManager().registerEvents(new CoreApiPlugin(), this);
         getServer().getPluginManager().registerEvents(playerManager, this);
         logInfo("Registered Event Handlers");
 
@@ -115,16 +119,42 @@ public final class GameCore extends JavaPlugin {
         gameManager.stopGames();
 
         dataManager.save();
-        scriptManager.unload();
     }
 
     private void postEnable() {
-        scriptManager.load();
-
-        scriptManager.preloadGameScripts();
+        luaApi = new LuaScriptApi();
+        luaApi.buildLibraries();
 
         if (getConfig().getBoolean("lua.auto-load-scripts")) {
-            scriptManager.loadGameScripts();
+            Path gamesPath = Paths.get(getDataFolder() + "/games");
+
+            try {
+                if (!Files.exists(gamesPath)) {
+                    Files.createDirectories(gamesPath);
+                }
+            } catch (IOException e) {
+                logger.error("Unable to load game scripts: Failed to create game script directory!\n\t{}", e.getMessage());
+                return;
+            }
+
+            if (!Files.isDirectory(gamesPath)) {
+                logger.error("Unable to load game scripts: {} is not a directory!", gamesPath);
+                return;
+            }
+
+            File[] files = gamesPath.toFile().listFiles((dir, name) -> name.endsWith(".lua"));
+            if (files == null)
+                return;
+
+            for (File file : files) {
+                if (!file.canRead())
+                    continue;
+
+                var script = luaApi.getScript(file);
+                ScriptedGame game = new ScriptedGame(script);
+                gameManager.registerGame(game);
+                luaApi.loadScript(script, game);
+            }
         }
     }
 
@@ -170,6 +200,10 @@ public final class GameCore extends JavaPlugin {
         return instance.messages;
     }
 
+    public static ComponentLogger logger() {
+        return instance.logger;
+    }
+
     public static QueueManager getQueueManager() {
         return instance.queueManager;
     }
@@ -186,8 +220,12 @@ public final class GameCore extends JavaPlugin {
         return instance.gameManager;
     }
 
-    public static ScriptManager getScriptManager() {
-        return instance.scriptManager;
+    public static ScriptApi getScriptApi() {
+        return instance.luaApi;
+    }
+
+    public static LuaApi luaApi() {
+        return instance.luaApi;
     }
 
     public static DataManager getDataManager() {

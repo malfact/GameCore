@@ -46,11 +46,12 @@ public final class GameCoreCommands {
                 .withArguments(new StringArgument("game"))
                 .executes((sender, args) -> {
                     String name = args.getUnchecked("game");
-                    var manager = GameCore.getScriptManager();
-                    if (!manager.preloadGameScript(name) || !manager.loadGameScript(name)) {
-                        sender.sendMessage("Script " + name + ".lua does not exist!");
-                        return;
-                    }
+//                    var manager = GameCore.getScriptManager();
+                    // TODO: Fix
+//                    if (!manager.preloadGameScript(name) || !manager.loadGameScript(name)) {
+//                        sender.sendMessage("Script " + name + ".lua does not exist!");
+//                        return;
+//                    }
 
                     sender.sendMessage("Script " + name + ".lua loaded!");
                 })
@@ -64,7 +65,6 @@ public final class GameCoreCommands {
                         return;
                     }
                     GameCore.getGameManager().unregisterGame(name);
-                    GameCore.getScriptManager().unloadGameScript(name);
                     sender.sendMessage("Script " + name + ".lua unloaded!");
                 })
             ).withSubcommand(new CommandAPICommand("state")

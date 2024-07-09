@@ -3,6 +3,7 @@ package net.malfact.gamecore.game;
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.event.*;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -47,6 +48,8 @@ public abstract class Game {
      */
     public abstract String getDisplayName();
 
+    public abstract void setDisplayName(String name);
+
     /**
      * Add a player to this game.
      * <p>
@@ -82,8 +85,9 @@ public abstract class Game {
         if (!players.contains(player.getUniqueId()))
             return false;
 
-        players.remove(player.getUniqueId());
         Bukkit.getPluginManager().callEvent(new PlayerLeaveGameEvent(this, player));
+
+        players.remove(player.getUniqueId());
         return true;
     }
 
@@ -128,9 +132,8 @@ public abstract class Game {
         if (entities.contains(entity))
             return false;
 
-        GameCore.logDebug("Registered entity " + entity.getName() + " with game: " + getName());
-
         entities.add(entity);
+        GameCore.logDebug("Registered entity " + entity.getName() + " with game: " + getName());
         return true;
     }
 
@@ -368,4 +371,6 @@ public abstract class Game {
         RUNNING,
         STOPPING
     }
+
+    public abstract void registerBlockChange(Location loc);
 }

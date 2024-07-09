@@ -1,20 +1,13 @@
 package net.malfact.gamecore.api;
 
-import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.script.Instance;
-import org.luaj.vm2.lib.TwoArgFunction;
+import net.malfact.gamecore.game.Game;
 
-import java.util.Objects;
+public abstract class InstancedLib implements LuaLib {
 
-public abstract class InstancedLib extends TwoArgFunction {
+    protected final Game instance;
 
-    /**
-     * The {@code Game} instance.
-     */
-    protected final Instance instance;
-
-    public InstancedLib(Instance instance) {
-        this.instance = Objects.requireNonNull(instance);
-        GameCore.logDebug("--> Created " + this.getClass().getSimpleName());
+    public InstancedLib(Game game) {
+        this.instance = game;
     }
+
 }

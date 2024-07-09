@@ -1,9 +1,10 @@
 package net.malfact.gamecore.game;
 
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.api.event.EventRegistry;
-import net.malfact.gamecore.api.event.GameListener;
-import net.malfact.gamecore.script.Instance;
+import net.malfact.gamecore.LuaScript;
+import net.malfact.gamecore.api.LuaApi;
+import net.malfact.gamecore.lua.event.EventRegistry;
+import net.malfact.gamecore.lua.event.GameListener;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -15,18 +16,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class ScriptedGame extends Game {
 
-    private final Supplier<Instance> instance;
+    private final LuaScript script;
     private String displayName;
 
     private List<FunctionCallback> callbacks;
     private Map<String, SavedBlockData> savedBlockDataMap;
 
-    public ScriptedGame(Supplier<Instance> instance) {
-        this.instance = instance;
+    public ScriptedGame(LuaScript script) {
+        this.script = script;
     }
 
     public void setDisplayName(String name) {
@@ -37,7 +37,7 @@ public class ScriptedGame extends Game {
         if (callbacks == null)
             callbacks = new ArrayList<>();
 
-        FunctionCallback callback = new FunctionCallback(instance.get(), function);
+        FunctionCallback callback = new FunctionCallback(this, function);
         callbacks.add(callback);
 
         return callback;
@@ -45,7 +45,7 @@ public class ScriptedGame extends Game {
 
     @Override
     public String getName() {
-        return instance.get().getScript().getName();
+        return script.getName();
     }
 
     @Override
@@ -58,7 +58,7 @@ public class ScriptedGame extends Game {
 
     @Override
     protected void onStart() {
-        if (!instance.get().getScript().run()){
+        if (!script.run()){
             GameCore.getInstance().logError("Problem in " + getName() + ": Stopping.");
             stop();
         }
@@ -66,7 +66,7 @@ public class ScriptedGame extends Game {
 
     @Override
     public void onReload() {
-        GameCore.getScriptManager().reloadScript(instance.get().getScript(), this);
+        GameCore.getScriptApi().loadScript(script, this);
     }
 
     @Override
@@ -75,6 +75,7 @@ public class ScriptedGame extends Game {
             for (var callback : callbacks) {
                 EventRegistry.unregisterListener(callback);
             }
+            callbacks.clear();
         }
 
         if (savedBlockDataMap != null && !savedBlockDataMap.isEmpty()) {
@@ -82,6 +83,7 @@ public class ScriptedGame extends Game {
                 World world = change.location().getWorld();
                 world.setBlockData(change.location, change.blockData);
             }
+            savedBlockDataMap.clear();
         }
     }
 
@@ -103,11 +105,11 @@ public class ScriptedGame extends Game {
 
     private static record SavedBlockData(Location location, BlockData blockData){};
 
-    private static class FunctionCallback extends GameListener {
+    private class FunctionCallback extends GameListener {
 
         private final LuaFunction function;
 
-        private FunctionCallback(Instance instance, LuaFunction function) {
+        private FunctionCallback(ScriptedGame instance, LuaFunction function) {
             super(instance);
             this.function = function;
         }
@@ -115,9 +117,9 @@ public class ScriptedGame extends Game {
         @Override
         public void onEvent(Event event) {
             try {
-                function.call(instance.getValueOf(event));
+                function.call(LuaApi.userdataOf(event, instance));
             } catch (LuaError error) {
-                GameCore.getInstance().logError("Error in " + instance.getScript() + ":\n" + error.getMessage());
+                GameCore.logger().error("Error in {}:\n\t{}", script, error.getMessage());
             }
         }
     }
