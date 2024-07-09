@@ -48,7 +48,7 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
 
         meta.set(LuaConstant.MetaTag.METATABLE, LuaConstant.FALSE);
 
-        return new LuaUserdata(instance, meta);
+        return new LuaUserdata(object, meta);
     }
 
     protected LuaValue get(Game instance, T entity, String key) {
