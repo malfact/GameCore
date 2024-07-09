@@ -242,6 +242,7 @@ public abstract class Game {
 
         stop = false;
         state = State.STOPPED;
+
         this.clean();
     }
 
@@ -351,7 +352,7 @@ public abstract class Game {
     }
 
     public void registerCleanable(Cleanable<BossBar> cleanable) {
-
+        cleanables.add(cleanable);
     }
 
     private static class GameTask extends BukkitRunnable {
