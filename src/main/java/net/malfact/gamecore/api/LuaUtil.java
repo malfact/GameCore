@@ -114,15 +114,27 @@ public abstract class LuaUtil {
 
     // -----
 
+    public static String toString(LuaValue arg) {
+        LuaValue tag = arg.metatag(LuaConstant.MetaTag.TOSTRING);
+        if (!tag.isnil())
+            return tag.call().tojstring();
+
+        if (arg.isuserdata())
+            return "userdata";
+
+        return arg.tojstring();
+    }
+
     public static String toString(Varargs args) {
         if (args.narg() == 0)
             return "";
         if (args.narg() == 1)
             return args.arg1().tojstring();
 
-        StringBuilder builder = new StringBuilder(args.arg1().tojstring());
+        StringBuilder builder = new StringBuilder(toString(args.arg1()));
+
         for (int i = 2; i <= args.narg(); i++) {
-            builder.append(" ").append(args.tojstring(i));
+            builder.append(" ").append(toString(args.arg(i)));
         }
         return builder.toString();
     }
