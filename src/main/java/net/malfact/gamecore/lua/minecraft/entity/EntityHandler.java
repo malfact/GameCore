@@ -1,5 +1,6 @@
 package net.malfact.gamecore.lua.minecraft.entity;
 
+import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.Vector3;
 import net.malfact.gamecore.api.LuaApi;
 import net.malfact.gamecore.api.LuaUtil;
@@ -260,7 +261,7 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
         public LuaValue call(LuaValue userdata) {
             Entity entity = userdata.checkuserdata(Entity.class);
             if (entity instanceof Player player)
-                return valueOf(instance.leaveGame(player));
+                return valueOf(GameCore.gameManager().leaveGame(player));
 
             if (!instance.isActive())
                 return LuaConstant.FALSE;

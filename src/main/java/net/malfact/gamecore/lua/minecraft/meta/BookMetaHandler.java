@@ -26,7 +26,7 @@ public class BookMetaHandler extends ItemMetaHandler<BookMeta> {
         switch (key) {
             case "title" -> meta.title(LuaUtil.toComponent(value.checkjstring()));
             case "author" -> meta.author(LuaUtil.toComponent(value.checkjstring()));
-            case "generation" -> meta.setGeneration(LuaUtil.toEnum(value.checkjstring(), BookMeta.Generation.class));
+            case "generation" -> meta.setGeneration(LuaUtil.checkEnum(value, BookMeta.Generation.class));
             default -> {
                 return false;
             }

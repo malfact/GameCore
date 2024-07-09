@@ -42,7 +42,7 @@ public class ItemEntityHandler extends EntityHandler<Item> {
             case "willAge" -> item.setWillAge(value.checkboolean());
             case "health" -> item.setHealth(value.checkint());
             default -> super.set(instance, item, key, value);
-        };
+        }
     }
 
     @Override

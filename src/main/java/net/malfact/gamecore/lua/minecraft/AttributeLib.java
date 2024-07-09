@@ -29,7 +29,7 @@ public class AttributeLib implements LuaLib, TypeHandler<AttributeInstance> {
         meta.set(LuaConstant.MetaTag.INDEX, func_attributeOnIndex);
         meta.set(LuaConstant.MetaTag.TOSTRING, func_attributeToString);
 
-        meta.set("__userdata_type__", "attributeinstance");
+        meta.set("__userdata_type__", "attribute_instance");
 
         meta.set(LuaConstant.MetaTag.METATABLE, LuaConstant.FALSE);
 

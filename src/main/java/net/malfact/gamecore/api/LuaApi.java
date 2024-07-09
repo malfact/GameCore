@@ -89,19 +89,19 @@ public interface LuaApi {
         if (o instanceof LuaValue v)
             return v;
 
-        switch (o) {
-            case Boolean v:     return valueOf(v);
-            case Integer v:     return valueOf(v);
-            case Double v:      return valueOf(v);
-            case Character v:   return valueOf(v);
-            case Float v:       return valueOf(v);
-            case byte[] v:      return valueOf(v);
-            case String v:      return valueOf(v);
-            case Component v:   return valueOf(v);
-            case Keyed v:       return LuaValue.valueOf(v.getKey().asMinimalString().toLowerCase(Locale.ROOT));
-            case Enum<?> v:     return LuaValue.valueOf(v.toString().toLowerCase(Locale.ROOT));
-            default:            return LuaConstant.NIL;
-        }
+        return switch (o) {
+            case Boolean v -> valueOf(v);
+            case Integer v -> valueOf(v);
+            case Double v -> valueOf(v);
+            case Character v -> valueOf(v);
+            case Float v -> valueOf(v);
+            case byte[] v -> valueOf(v);
+            case String v -> valueOf(v);
+            case Component v -> valueOf(v);
+            case Keyed v -> LuaValue.valueOf(v.getKey().asMinimalString().toLowerCase(Locale.ROOT));
+            case Enum<?> v -> LuaValue.valueOf(v.toString().toLowerCase(Locale.ROOT));
+            default -> LuaConstant.NIL;
+        };
     }
 
 }

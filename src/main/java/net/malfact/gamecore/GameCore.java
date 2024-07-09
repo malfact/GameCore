@@ -160,7 +160,7 @@ public final class GameCore extends JavaPlugin {
 
     public static void logDebug(String message) {
         if (instance.debug)
-            instance.logger.info("[DEBUG] " + message);
+            instance.logger.info("[DEBUG] {}", message);
     }
 
     public void logInfo(String message) {

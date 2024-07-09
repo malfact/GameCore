@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings({"unused", "UnusedReturnValue"})
+@SuppressWarnings({"unused", "UnusedReturnValue", "EmptyMethod"})
 public abstract class Game {
 
     private int timer;
@@ -65,21 +65,14 @@ public abstract class Game {
      *     Fires {@link PlayerJoinGameEvent}
      * </p>
      * @param player the player
-     * @return {@code true} if successful, otherwise {@code false}
      */
-    public boolean joinGame(Player player) {
-        if (state != State.RUNNING)
-            return false;
-
+    final void joinGame(Player player) {
         if (players.contains(player.getUniqueId()))
-            return false;
+            return;
 
-        GameCore.logDebug("Registered player " + player.getName() + " with game: " + getName());
-
+        GameCore.logger().debug("Registered player {} with game: {}", player.getName(), getName());
         players.add(player.getUniqueId());
         Bukkit.getPluginManager().callEvent(new PlayerJoinGameEvent(this, player));
-
-        return true;
     }
 
     /**
@@ -88,16 +81,14 @@ public abstract class Game {
      *     Fires {@link PlayerLeaveGameEvent}
      * </p>
      * @param player the player
-     * @return {@code true} if successful, otherwise {@code false}
      */
-    public boolean leaveGame(Player player) {
+    final void leaveGame(Player player) {
         if (!players.contains(player.getUniqueId()))
-            return false;
+            return;
 
+        GameCore.logger().debug("Unregistered player {} with game: {}", player.getName(), getName());
         Bukkit.getPluginManager().callEvent(new PlayerLeaveGameEvent(this, player));
-
         players.remove(player.getUniqueId());
-        return true;
     }
 
     /**
@@ -136,7 +127,7 @@ public abstract class Game {
      */
     public final boolean registerEntity(Entity entity) {
         if (entity instanceof Player player)
-            return joinGame(player);
+            return GameCore.gameManager().joinGame(player, this);
 
         if (entities.contains(entity))
             return false;
@@ -157,7 +148,7 @@ public abstract class Game {
      */
     public final boolean unregisterEntity(Entity entity) {
         if (entity instanceof Player player)
-            return leaveGame(player);
+            return GameCore.gameManager().leaveGame(player);
 
         if (!entities.contains(entity))
             return false;

@@ -117,7 +117,7 @@ public final class PlayerManager extends GameCoreManager implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        GamePlayer gamePlayer = null;
+        GamePlayer gamePlayer;
         if (!players.containsKey(uuid)) {
             Optional<PlayerData> playerData = loadPlayerData(uuid);
 

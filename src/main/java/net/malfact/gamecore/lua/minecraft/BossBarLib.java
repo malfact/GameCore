@@ -15,7 +15,7 @@ import org.luaj.vm2.*;
 
 public class BossBarLib implements LuaLib {
 
-    public static TypeHandler<BossBar> HANDLER = new Handler();
+    public static final TypeHandler<BossBar> HANDLER = new Handler();
 
     private final LuaFunction func_new = LuaUtil.toVarargFunction(this::createBossBar);
 

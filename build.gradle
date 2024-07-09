@@ -7,7 +7,7 @@ plugins {
 group = 'net.malfact'
 version = '1.1.7-SNAPSHOT'
 
-def Properties properties = new Properties()
+Properties properties = new Properties()
 properties.load(project.rootProject.file("local.properties").newDataInputStream())
 
 repositories {
@@ -83,6 +83,7 @@ tasks.register('deleteOldCopy', Delete) {
         return
 
     delete(fileTree(copyToDir).matching {
+        //noinspection GrUnresolvedAccess
         include "${rootProject.name}**.jar"
     }.files)
 

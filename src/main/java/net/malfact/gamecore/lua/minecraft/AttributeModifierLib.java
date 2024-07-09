@@ -37,7 +37,7 @@ public class AttributeModifierLib implements LuaLib, TypeHandler<AttributeModifi
         meta.set(LuaConstant.MetaTag.TOSTRING, func_modifierToString);
         meta.set(LuaConstant.MetaTag.EQ, func_equals);
 
-        meta.set("__userdata_type__", "attributemodifier");
+        meta.set("__userdata_type__", "attribute_modifier");
 
         meta.set(LuaConstant.MetaTag.METATABLE, LuaConstant.FALSE);
 

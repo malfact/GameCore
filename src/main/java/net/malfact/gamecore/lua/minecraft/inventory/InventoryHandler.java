@@ -244,7 +244,7 @@ public class InventoryHandler<I extends Inventory> implements TypeHandler<I> {
         var self = arg1.checkuserdata(Inventory.class);
         ItemStack item = arg2.touserdata(ItemStack.class);
 
-        boolean value = false;
+        boolean value;
 
         if (item == null && !arg3.isint())
             value = self.contains(LuaUtil.checkMaterial(arg2));

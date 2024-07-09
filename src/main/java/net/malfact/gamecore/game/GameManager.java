@@ -6,8 +6,11 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class GameManager extends GameCoreManager {
+
+    private static final Map<UUID, String> PLAYERS_IN_GAMES = new HashMap<>();
 
     private final Map<String, Game> games;
 
@@ -29,6 +32,8 @@ public class GameManager extends GameCoreManager {
         if (game != null && game.isRunning()) {
             game.forceStop();
         }
+
+        PLAYERS_IN_GAMES.entrySet().removeIf(entry -> entry.getValue().equals(name));
     }
 
     public Game getGame(String game) {
@@ -36,12 +41,32 @@ public class GameManager extends GameCoreManager {
     }
 
     public Game getGame(Player player) {
-        for (var game : games.values()) {
-            if (game.hasPlayer(player))
-                return game;
-        }
+        if (!PLAYERS_IN_GAMES.containsKey(player.getUniqueId()))
+            return null;
 
-        return null;
+        return getGame(PLAYERS_IN_GAMES.get(player.getUniqueId()));
+    }
+
+    public boolean joinGame(Player player, Game game) {
+        if (isPlayerInGame(player))
+            return false;
+
+        if (game.getState() != Game.State.RUNNING)
+            return false;
+
+        game.joinGame(player);
+        PLAYERS_IN_GAMES.put(player.getUniqueId(), game.getName());
+        return true;
+    }
+
+    public boolean leaveGame(Player player) {
+        Game game = getGame(player);
+        if (game == null)
+            return false;
+
+        game.leaveGame(player);
+        PLAYERS_IN_GAMES.remove(player.getUniqueId());
+        return true;
     }
 
     /**
@@ -56,9 +81,16 @@ public class GameManager extends GameCoreManager {
             game.stop();
             game.forceStop();
         }
+
+        PLAYERS_IN_GAMES.clear();
+        games.clear();
     }
 
     public String[] getGameNames() {
         return games.keySet().toArray(new String[0]);
+    }
+
+    public boolean isPlayerInGame(Player player) {
+        return PLAYERS_IN_GAMES.containsKey(player.getUniqueId());
     }
 }

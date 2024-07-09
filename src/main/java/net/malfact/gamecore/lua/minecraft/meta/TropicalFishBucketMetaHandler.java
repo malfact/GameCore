@@ -28,9 +28,9 @@ public class TropicalFishBucketMetaHandler extends ItemMetaHandler<TropicalFishB
     @Override
     public boolean set(TropicalFishBucketMeta meta, String key, LuaValue value) {
         switch (key) {
-            case "patternColor" -> meta.setPatternColor(LuaUtil.toEnum(value.checkjstring(), DyeColor.class));
-            case "bodyColor" -> meta.setBodyColor(LuaUtil.toEnum(value.checkjstring(), DyeColor.class));
-            case "pattern" -> meta.setPattern(LuaUtil.toEnum(value.checkjstring(), TropicalFish.Pattern.class));
+            case "patternColor" -> meta.setPatternColor(LuaUtil.checkEnum(value, DyeColor.class));
+            case "bodyColor" -> meta.setBodyColor(LuaUtil.checkEnum(value, DyeColor.class));
+            case "pattern" -> meta.setPattern(LuaUtil.checkEnum(value, TropicalFish.Pattern.class));
             default -> {
                 return false;
             }

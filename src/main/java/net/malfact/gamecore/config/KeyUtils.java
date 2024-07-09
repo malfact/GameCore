@@ -12,11 +12,7 @@ public class KeyUtils {
 
 	public static String getIndents(final String key, final char separator) {
 		final String[] splitKey = key.split("[" + separator + "]");
-		final StringBuilder builder = new StringBuilder();
 
-		for (int i = 1; i < splitKey.length; i++) {
-			builder.append("  ");
-		}
-		return builder.toString();
+        return "  ".repeat(Math.max(0, splitKey.length - 1));
 	}
 }

@@ -1,10 +1,10 @@
 package net.malfact.gamecore.queue;
 
 import net.malfact.gamecore.GameCore;
+import net.malfact.gamecore.Messages;
 import net.malfact.gamecore.player.GamePlayer;
 import net.malfact.gamecore.team.GameTeam;
 import net.malfact.gamecore.util.DataHolder;
-import net.malfact.gamecore.Messages;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -160,6 +160,7 @@ public class GameQueue implements DataHolder<QueueData> {
         }
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public int popWithTeam(@NotNull GameTeam team, int count) {
         Objects.requireNonNull(team);
 

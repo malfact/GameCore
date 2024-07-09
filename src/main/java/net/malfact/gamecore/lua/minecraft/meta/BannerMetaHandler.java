@@ -56,7 +56,7 @@ public class BannerMetaHandler extends ItemMetaHandler<BannerMeta> {
     }
 
     private static Pattern toPattern(LuaTable table) {
-        DyeColor color = LuaUtil.toEnum(table.get("color").checkjstring(), DyeColor.class);
+        DyeColor color = LuaUtil.checkEnum(table.get("color"), DyeColor.class);
         PatternType pattern = LuaUtil.toRegistryEntry(table.get("pattern").checkjstring(), RegistryKey.BANNER_PATTERN);
 
         return new Pattern(color, pattern);

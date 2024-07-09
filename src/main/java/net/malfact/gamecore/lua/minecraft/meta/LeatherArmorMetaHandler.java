@@ -24,15 +24,15 @@ public class LeatherArmorMetaHandler extends ItemMetaHandler<LeatherArmorMeta> {
     @Override
     public boolean set(LeatherArmorMeta meta, String key, LuaValue value) {
         if (key.equals("color")) {
-            meta.setColor(toColor(value.checkjstring()));
+            meta.setColor(toColor(value));
             return true;
         }
 
         return false;
     }
 
-    private static Color toColor(String string) {
-        var dyeColor = LuaUtil.toEnum(string, DyeColor.class);
+    private static Color toColor(LuaValue value) {
+        var dyeColor = LuaUtil.checkEnum(value, DyeColor.class);
 
         return dyeColor.getColor();
     }

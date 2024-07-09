@@ -103,7 +103,7 @@ public class ScriptedGame extends Game {
         savedBlockDataMap.put(key, new SavedBlockData(loc.toBlockLocation(), data));
     }
 
-    private static record SavedBlockData(Location location, BlockData blockData){};
+    private record SavedBlockData(Location location, BlockData blockData){}
 
     private class FunctionCallback extends GameListener {
 
