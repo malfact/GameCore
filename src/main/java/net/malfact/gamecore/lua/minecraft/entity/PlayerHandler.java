@@ -14,8 +14,8 @@ import org.luaj.vm2.*;
 
 public class PlayerHandler extends HumanEntityHandler<Player> {
 
-    private final LuaFunction func_sendMessageRaw =             LuaUtil.toFunction(this::sendMessageRaw);
-    private final LuaFunction func_sendMessage =                LuaUtil.toFunction(this::sendMessage);
+    private final LuaFunction func_sendMessageRaw =             LuaUtil.toVarargFunction(this::sendMessageRaw);
+    private final LuaFunction func_sendMessage =                LuaUtil.toVarargFunction(this::sendMessage);
     private final LuaFunction func_sendActionBar =              LuaUtil.toFunction(this::sendActionBar);
     private final LuaFunction func_setTime =                    LuaUtil.toFunction(this::setTime);
     private final LuaFunction func_getTime =                    LuaUtil.toFunction(this::getTime);
@@ -160,6 +160,11 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
         return LuaUtil.fromComponent(player.name());
     }
 
+    @Override
+    protected String type() {
+        return "player";
+    }
+
     private void sendMessageRaw(Varargs args) {
         Varargs args1 = args.subargs(2);
         args.arg1().checkuserdata(Player.class).sendRawMessage(LuaUtil.toString(args1));
@@ -173,23 +178,27 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
         Player player = args.arg(1).checkuserdata(Player.class);
         World world = player.getWorld();
 
+        int o = 0;
+
         Location location = LuaUtil.toLocation(args.arg(2));
         if (location == null) {
             var entity = args.arg1().touserdata(Entity.class);
-            if (entity == null)
-                LuaUtil.argumentError(2, "Location or Entity", args.arg(2));
-
-            location = entity.getLocation();
+            if (entity == null) {
+                location = player.getLocation();
+                o = -1;
+            } else {
+                location = entity.getLocation();
+            }
         }
 
         location.setWorld(world);
 
-        var sound = LuaUtil.toSound(args.arg(3));
+        var sound = LuaUtil.toSound(args.arg(3 + o));
         if (sound == null)
-            LuaUtil.argumentError(3, "Sound", args.arg(3));
+            LuaUtil.argumentError(3 + o, "Sound", args.arg(3 + o));
 
-        float volume = (float) args.optdouble(4, 1);
-        float pitch = (float) args.optdouble(5, 1);
+        float volume = (float) args.optdouble(4 + o, 1);
+        float pitch = (float) args.optdouble(4 + o, 1);
 
         player.playSound(location, sound, SoundCategory.MASTER, volume, pitch);
     }
