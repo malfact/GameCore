@@ -216,11 +216,11 @@ public final class GameCore extends JavaPlugin {
         return instance.playerManager;
     }
 
-    public static GameManager getGameManager() {
+    public static GameManager gameManager() {
         return instance.gameManager;
     }
 
-    public static ScriptApi getScriptApi() {
+    public static ScriptApi scriptApi() {
         return instance.luaApi;
     }
 

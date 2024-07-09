@@ -66,7 +66,7 @@ public class ScriptedGame extends Game {
 
     @Override
     public void onReload() {
-        GameCore.getScriptApi().loadScript(script, this);
+        GameCore.scriptApi().loadScript(script, this);
     }
 
     @Override
