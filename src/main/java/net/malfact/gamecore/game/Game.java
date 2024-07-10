@@ -251,7 +251,7 @@ public abstract class Game {
         entities.clear();
 
         for (var player : getPlayers()) {
-            leaveGame(player);
+            GameCore.gameManager().leaveGame(player);
         }
 
         cleanables.forEach(Cleanable::clean);
