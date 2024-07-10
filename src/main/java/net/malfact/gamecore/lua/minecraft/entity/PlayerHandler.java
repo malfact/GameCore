@@ -77,14 +77,14 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
             case "wardenWarningCooldown" -> LuaValue.valueOf(player.getWardenWarningCooldown());
             case "wardenTimeSinceLastWarning" -> LuaValue.valueOf(player.getWardenTimeSinceLastWarning());
             case "wardenWarningLevel" -> LuaValue.valueOf(player.getWardenWarningLevel());
+            case "flySpeed" -> LuaValue.valueOf(player.getFlySpeed());
+            case "walkSpeed" -> LuaValue.valueOf(player.getWalkSpeed());
 
             // Get Only
             case "isOnline" -> LuaValue.valueOf(player.isOnline());
             case "isTimeRelative" -> LuaValue.valueOf(player.isPlayerTimeRelative());
             case "totalExpPoints" -> LuaValue.valueOf(player.calculateTotalExperiencePoints());
             case "expForNextLevel" -> LuaValue.valueOf(player.getExperiencePointsNeededForNextLevel());
-            case "flyspeed" -> LuaValue.valueOf(player.getFlySpeed());
-            case "walkspeed" -> LuaValue.valueOf(player.getWalkSpeed());
             case "cooldownPeriod" -> LuaValue.valueOf(player.getCooldownPeriod());
             case "idleDuration" -> LuaValue.valueOf(player.getIdleDuration().toSeconds());
             case "inventory" -> LuaApi.userdataOf(player.getInventory(), instance);
@@ -142,8 +142,8 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
             case "flyingFallDamage" ->
                 player.setFlyingFallDamage(value.isnil() ? TriState.NOT_SET : TriState.byBoolean(value.checkboolean()));
             case "flying" -> player.setFlying(value.checkboolean());
-            case "flySpeed" -> player.setFlySpeed((float) value.checkdouble());
-            case "walkSpeed" -> player.setWalkSpeed((float) value.checkdouble());
+            case "flySpeed" -> player.setFlySpeed((float) LuaUtil.toRange(value, -1.0, 1.0));
+            case "walkSpeed" -> player.setWalkSpeed((float) LuaUtil.toRange(value, -1.0, 1.0));
 //            case "scoreboard" -> // ToDo: Scoreboards
             case "spectatorTarget" -> {
                 if (player.getGameMode() == GameMode.SPECTATOR)
