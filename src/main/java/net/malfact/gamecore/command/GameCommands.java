@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 
 public class GameCommands {
 
@@ -91,69 +90,53 @@ public class GameCommands {
         throw CommandAPIBukkit.failWithAdventureComponent(Messages.get("TARGET_NOT_PLAYER", sender.getName()));
     }
 
-    private static int joinGame(CommandSender sender, Game game) throws WrapperCommandSyntaxException {
-        Player player = checkPlayer(sender);
-
-        if (GameCore.gameManager().joinGame(player, game))
-            return 1;
-
-        sender.sendMessage(Messages.get("SELF_ALREADY_IN_GAME"));
-        return 0;
-    }
-
-    private static int joinGame(CommandSender caller, CommandSender callee, Game game) throws WrapperCommandSyntaxException {
-        Player player = checkPlayer(callee);
-
-        if (GameCore.gameManager().joinGame(player, game)) {
-            caller.sendMessage(Messages.get("PLAYER_JOINED_GAME", player.getName(), game.getDisplayName()));
-            return 1;
+    private static int joinGame(Player player, Game game) {
+        if (GameCore.gameManager().isPlayerInGame(player)) {
+            player.sendMessage(Messages.get("SELF_ALREADY_IN_GAME"));
+            return 0;
         }
 
-        caller.sendMessage(Messages.get("PLAYER_ALREADY_IN_GAME"));
-        return 0;
+        GameCore.gameManager().joinGame(player, game);
+        return 1;
     }
 
-    private static int joinGame(CommandSender sender, Game game, Collection<Player> players) {
-        int count = 0;
-        for (var player : players) {
-            if (GameCore.gameManager().joinGame(player, game))
-                count++;
+    private static int joinGame(CommandSender sender, Player player, Game game) {
+        if (GameCore.gameManager().isPlayerInGame(player)) {
+            sender.sendMessage(Messages.get("PLAYER_ALREADY_IN_GAME", player.getName()));
+            return 0;
         }
 
-        sender.sendMessage(Messages.get("COUNT_JOINED_GAME", count, game));
-
-        return count;
+        GameCore.gameManager().joinGame(player, game);
+        sender.sendMessage(Messages.get("PLAYER_JOINED_GAME", player.getName(), game.getDisplayName()));
+        return 1;
     }
 
     public static int joinGame(CommandSender sender, @NotNull CommandArguments args) throws WrapperCommandSyntaxException {
         Game game = (Game) args.get("game");
+        // game join <game>
         if (args.count() == 1) {
+            // execute as @s run game join <game>
             if (sender instanceof ProxiedCommandSender proxy)
-                return joinGame(proxy.getCaller(), proxy.getCallee(), game);
-            else
-                return joinGame(sender, game);
-        } else {
-            Collection<Player> players = args.getUnchecked("players");
-            if (players == null)
-                return 0;
+                return joinGame(proxy.getCaller(), checkPlayer(proxy.getCallee()), game);
 
-            return joinGame(sender, game, players);
+            // game join <game>
+            else
+                return joinGame(checkPlayer(sender), game);
+
+        // game join <game> [player]
+        } else {
+            Player player = args.getUnchecked("player");
+            return player == null ? 0 : joinGame(sender, player, game);
         }
     }
 
-    private static void leaveGame(CommandSender sender) throws WrapperCommandSyntaxException {
-        Player player = checkPlayer(sender);
-
+    private static void leaveGame(Player player) {
         if (!GameCore.gameManager().isPlayerInGame(player)) {
-            sender.sendMessage(Messages.get("SELF_NOT_IN_GAME"));
+            player.sendMessage(Messages.get("SELF_NOT_IN_GAME"));
             return;
         }
 
         GameCore.gameManager().leaveGame(player);
-    }
-
-    private static void leaveGame(CommandSender caller, CommandSender callee) throws WrapperCommandSyntaxException {
-        leaveGame(caller, checkPlayer(callee));
     }
 
     private static void leaveGame(CommandSender sender, Player player) {
@@ -162,17 +145,21 @@ public class GameCommands {
             return;
         }
 
-        Game game = GameCore.gameManager().getGame(player);
         GameCore.gameManager().leaveGame(player);
-        sender.sendMessage(Messages.get("PLAYER_LEFT_GAME", player.getName(), game.getDisplayName()));
+        sender.sendMessage(Messages.get("PLAYER_LEFT_GAME", player.getName()));
     }
 
+
     public static void leaveGame(CommandSender sender, @NotNull CommandArguments args) throws WrapperCommandSyntaxException {
-        if (args.count() == 1) {
+        if (args.count() == 0) {
+            // execute as @s run game leave
             if (sender instanceof ProxiedCommandSender proxy)
-                leaveGame(proxy.getCaller(), proxy.getCallee());
+                leaveGame(proxy.getCaller(), checkPlayer(proxy.getCallee()));
+
+            // game leave
             else
-                leaveGame(sender);
+                leaveGame(checkPlayer(sender));
+        // game leave [player]
         } else {
             Player player = args.getUnchecked("player");
             if (player != null)

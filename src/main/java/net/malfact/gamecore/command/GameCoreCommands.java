@@ -50,7 +50,7 @@ public final class GameCoreCommands {
             .withSubcommand(new CommandAPICommand("join")
                 .withPermission("gamecore.game.join")
                 .withArguments(Arguments.Game("game"))
-                .withOptionalArguments(new EntitySelectorArgument.ManyPlayers("players")
+                .withOptionalArguments(new EntitySelectorArgument.OnePlayer("player")
                     .withPermission("gamecore.queue.join.other")
                 )
                 .executes(GameCommands::joinGame)

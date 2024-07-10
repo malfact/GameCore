@@ -54,8 +54,8 @@ public class GameManager extends GameCoreManager {
         if (game.getState() != Game.State.RUNNING)
             return false;
 
-        game.joinGame(player);
         PLAYERS_IN_GAMES.put(player.getUniqueId(), game.getName());
+        game.joinGame(player);
         return true;
     }
 
@@ -64,8 +64,8 @@ public class GameManager extends GameCoreManager {
         if (game == null)
             return false;
 
-        game.leaveGame(player);
         PLAYERS_IN_GAMES.remove(player.getUniqueId());
+        game.leaveGame(player);
         return true;
     }
 
