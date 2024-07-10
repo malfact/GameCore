@@ -393,4 +393,9 @@ public abstract class Game {
     }
 
     public abstract void registerBlockChange(Location loc);
+
+    @Override
+    public String toString() {
+        return getDisplayName();
+    }
 }
