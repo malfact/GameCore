@@ -89,14 +89,16 @@ public class GameLib extends EventLib {
         return table;
     }
 
-    private LuaValue joinGame(LuaValue arg) {
-        Player player = arg.checkuserdata(Player.class);
+    private LuaValue joinGame(LuaValue args) {
+        Player player = args.arg1().checkuserdata(Player.class);
         Game game = GameCore.gameManager().getGame(player);
 
         if (game != null)
             return LuaConstant.FALSE;
 
-        return LuaValue.valueOf(GameCore.gameManager().joinGame(player, instance));
+        var joined = GameCore.gameManager().joinGame(player, instance);
+
+        return joined ? LuaApi.userdataOf(player, instance) : LuaConstant.FALSE;
     }
 
     private LuaValue leaveGame(LuaValue arg) {
