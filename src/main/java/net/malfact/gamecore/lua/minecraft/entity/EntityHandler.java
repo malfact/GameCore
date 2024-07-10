@@ -46,6 +46,9 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
 
     @Override
     public final LuaValue getUserdataOf(T entity, Game instance) {
+        if (!instance.hasEntity(entity))
+            return getUserdataOf(entity);
+
         LuaTable meta = new LuaTable();
 
         meta.set(LuaConstant.MetaTag.INDEX,     new InstancedGet<>(this, instance));
