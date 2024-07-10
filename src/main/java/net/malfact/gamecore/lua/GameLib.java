@@ -29,7 +29,7 @@ public class GameLib extends EventLib {
     protected LuaValue createLib(LuaValue env) {
         LuaTable lib = new LuaTable();
 
-        lib.set("getPlayers ",  func_getPlayers);
+        lib.set("getPlayers",   func_getPlayers);
         lib.set("getEntities",  func_getEntities);
         lib.set("joinGame",     func_joinGame);
         lib.set("leaveGame",    func_leaveGame);
