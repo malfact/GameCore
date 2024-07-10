@@ -531,6 +531,10 @@ public abstract class LuaUtil {
     // ---------- Indirect Functions ---------- //
 
 
+    public static LuaFunction toFunction(Runnable function) {
+        return new IndirectRunnable(function);
+    }
+
     public static LuaFunction toFunction(Function<LuaValue, LuaValue> function) {
         return new IndirectFunction(function);
     }
@@ -569,6 +573,20 @@ public abstract class LuaUtil {
 
     public static LuaFunction toVarargFunction(Supplier<Varargs> function) {
         return new IndirectVarargSupplier(function);
+    }
+
+    private static class IndirectRunnable extends ZeroArgFunction {
+        private final Runnable function;
+
+        private IndirectRunnable(Runnable function) {
+            this.function = function;
+        }
+
+        @Override
+        public LuaValue call() {
+            function.run();
+            return LuaConstant.NIL;
+        }
     }
 
     private static class IndirectFunction extends OneArgFunction {
