@@ -232,7 +232,6 @@ public abstract class Game {
 
         this.onStop();
         Bukkit.getPluginManager().callEvent(new GameStopEvent(this));
-        players.clear();
 
         if (gameTask != null && !gameTask.isCancelled())
             gameTask.cancel();
@@ -380,7 +379,6 @@ public abstract class Game {
                 return;
             }
 
-            game.timer++;
             game.tick();
         }
     }
