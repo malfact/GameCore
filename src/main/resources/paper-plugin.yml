@@ -12,6 +12,9 @@ dependencies:
     PlaceholderAPI:
       load: BEFORE
       required: false
+    WorldGuard:
+      load: BEFORE
+      required: false
 permissions:
   gamecore.*:
     default: op
