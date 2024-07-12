@@ -58,11 +58,6 @@ public class BossBarLib implements LuaLib {
         private final LuaFunction func_removeAll = LuaUtil.toFunction(this::removeAll);
 
         @Override
-        public Class<BossBar> getTypeClass() {
-            return BossBar.class;
-        }
-
-        @Override
         public LuaValue getUserdataOf(BossBar bossbar) {
             LuaTable meta = new LuaTable();
 

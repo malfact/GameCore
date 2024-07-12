@@ -147,11 +147,6 @@ public class Vector3Lib implements LuaLib, TypeHandler<Vector3> {
     }
 
     @Override
-    public Class<Vector3> getTypeClass() {
-        return Vector3.class;
-    }
-
-    @Override
     public LuaValue getUserdataOf(Vector3 vec) {
         return userdataOf(vec);
     }

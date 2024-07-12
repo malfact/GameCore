@@ -1,19 +1,19 @@
-package net.malfact.gamecore.event;
+package net.malfact.gamecore.event.player;
 
-import net.malfact.gamecore.player.GamePlayer;
+import net.malfact.gamecore.player.QueuedPlayer;
 import net.malfact.gamecore.team.GameTeam;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-public class PlayerLeaveTeamEvent extends Event {
+public class PlayerJoinTeamEvent extends Event {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
 
-    private final GamePlayer player;
+    private final QueuedPlayer player;
     private final GameTeam team;
 
-    public PlayerLeaveTeamEvent(@NotNull GamePlayer player, @NotNull GameTeam team) {
+    public PlayerJoinTeamEvent(@NotNull QueuedPlayer player, @NotNull GameTeam team) {
         this.player = player;
         this.team = team;
     }
@@ -28,7 +28,7 @@ public class PlayerLeaveTeamEvent extends Event {
         return HANDLER_LIST;
     }
 
-    public @NotNull GamePlayer getPlayer() {
+    public @NotNull QueuedPlayer getPlayer() {
         return this.player;
     }
 

@@ -181,11 +181,6 @@ public class LocationLib implements LuaLib, TypeHandler<Location> {
     }
 
     @Override
-    public Class<Location> getTypeClass() {
-        return Location.class;
-    }
-
-    @Override
     public LuaValue getUserdataOf(Location location) {
         return userdataOf(location);
     }

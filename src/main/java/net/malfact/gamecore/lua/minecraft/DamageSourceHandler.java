@@ -13,11 +13,6 @@ import org.luaj.vm2.LuaValue;
 public class DamageSourceHandler implements TypeHandler<DamageSource> {
 
     @Override
-    public Class<DamageSource> getTypeClass() {
-        return DamageSource.class;
-    }
-
-    @Override
     public LuaValue getUserdataOf(DamageSource object) {
         LuaTable meta = new LuaTable();
         meta.set(LuaConstant.MetaTag.INDEX, LuaUtil.toFunction(DamageSourceHandler::onIndex));

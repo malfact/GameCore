@@ -107,11 +107,6 @@ public class ItemStackLib implements LuaLib, TypeHandler<ItemStack> {
     // ----- ----- Type Handler ----- -----
 
     @Override
-    public Class<ItemStack> getTypeClass() {
-        return ItemStack.class;
-    }
-
-    @Override
     public LuaValue getUserdataOf(ItemStack item) {
         return userdataOf(item);
     }

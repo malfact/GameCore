@@ -28,12 +28,7 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
     }
 
     @Override
-    public final Class<T> getTypeClass() {
-        return entityClass;
-    }
-
-    @Override
-    public final LuaValue getUserdataOf(T entity) {
+    public LuaValue getUserdataOf(T entity) {
         LuaTable meta = new LuaTable();
         meta.set(LuaConstant.MetaTag.INDEX,     func_indexUnregistered);
         meta.set(LuaConstant.MetaTag.TOSTRING,  func_tostring);
@@ -45,7 +40,7 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
     }
 
     @Override
-    public final LuaValue getUserdataOf(T entity, Game instance) {
+    public LuaValue getUserdataOf(T entity, Game instance) {
         if (!instance.hasEntity(entity))
             return getUserdataOf(entity);
 

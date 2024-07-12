@@ -5,16 +5,19 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.executors.CommandArguments;
 import dev.jorel.commandapi.wrappers.NativeProxyCommandSender;
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.player.GamePlayer;
-import net.malfact.gamecore.team.GameTeam;
 import net.malfact.gamecore.Messages;
+import net.malfact.gamecore.player.QueuedPlayer;
+import net.malfact.gamecore.team.GameTeam;
 import net.malfact.gamecore.util.Validate;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
 
 @SuppressWarnings("ConstantConditions")
 public class GameTeamCommand {
@@ -47,7 +50,7 @@ public class GameTeamCommand {
 
         if (optionalTeam.isPresent()) {
             GameTeam team = (GameTeam) optionalTeam.get();
-            Set<GamePlayer> players = team.getPlayers();
+            Set<QueuedPlayer> players = team.getPlayers();
 
             String[] names = players.stream().map(player -> {
                 boolean online = player.isOnline();
@@ -56,7 +59,7 @@ public class GameTeamCommand {
 
             int online = 0;
 
-            for (GamePlayer player : players) {
+            for (QueuedPlayer player : players) {
                 if (player.isOnline()) online++;
             }
 
@@ -92,7 +95,7 @@ public class GameTeamCommand {
             player = (Player) sender;
         }
 
-        GamePlayer gamePlayer = Validate.isGamePlayer(player);
+        QueuedPlayer gamePlayer = Validate.isGamePlayer(player);
 
         if (team.hasPlayer(gamePlayer)) {
             if (proxiedCaller != null)
@@ -115,11 +118,11 @@ public class GameTeamCommand {
         Collection<Player> players = (Collection<Player>) arguments.get("player");
 
         GameTeam team = (GameTeam) arguments.get("team");
-        GamePlayer[] gamePlayers = players.stream().map(Validate::isGamePlayer).toArray(GamePlayer[]::new);
+        QueuedPlayer[] gamePlayers = players.stream().map(Validate::isGamePlayer).toArray(QueuedPlayer[]::new);
 
         int count = 0;
 
-        for (GamePlayer gamePlayer : gamePlayers) {
+        for (QueuedPlayer gamePlayer : gamePlayers) {
             if (team.hasPlayer(gamePlayer))
                 continue;
 
@@ -145,7 +148,7 @@ public class GameTeamCommand {
             player = (Player) sender;
         }
 
-        GamePlayer gamePlayer = Validate.isGamePlayer(player);
+        QueuedPlayer gamePlayer = Validate.isGamePlayer(player);
 
         if (GameCore.getTeamManager().getTeam(gamePlayer) == null) {
             if (proxiedCaller != null)
@@ -164,7 +167,7 @@ public class GameTeamCommand {
     }
 
     public static void leaveTeamOther(CommandSender sender, CommandArguments arguments) throws WrapperCommandSyntaxException {
-        GamePlayer player = Validate.isGamePlayer((Player) arguments.get("player"));
+        QueuedPlayer player = Validate.isGamePlayer((Player) arguments.get("player"));
 
         GameTeam team = GameCore.getTeamManager().getTeam(player);
 
@@ -251,7 +254,7 @@ public class GameTeamCommand {
         Player player = (Player) arguments[0];
         GameTeam team = (GameTeam) arguments[1];
 
-        GamePlayer gamePlayer = GameCore.getPlayerManager().getPlayer(player);
+        QueuedPlayer gamePlayer = GameCore.getPlayerManager().getPlayer(player);
 
         if (gamePlayer == null)
             return false;

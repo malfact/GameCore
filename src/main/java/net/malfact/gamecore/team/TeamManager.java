@@ -3,7 +3,7 @@ package net.malfact.gamecore.team;
 import com.google.gson.reflect.TypeToken;
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.GameCoreManager;
-import net.malfact.gamecore.player.GamePlayer;
+import net.malfact.gamecore.player.QueuedPlayer;
 import net.malfact.gamecore.util.Json;
 import org.bukkit.Bukkit;
 
@@ -66,7 +66,7 @@ public class TeamManager extends GameCoreManager {
      * @param player the player
      * @return the Team, otherwise <i>null</i>
      */
-    public GameTeam getTeam(GamePlayer player) {
+    public GameTeam getTeam(QueuedPlayer player) {
         String team = PLAYER_TEAMS.get(player.getUniqueId());
 
         if (team == null)

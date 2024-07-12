@@ -1,5 +1,6 @@
 package net.malfact.gamecore.lua.minecraft;
 
+import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.api.LuaApi;
 import net.malfact.gamecore.api.LuaUtil;
 import net.malfact.gamecore.game.Game;

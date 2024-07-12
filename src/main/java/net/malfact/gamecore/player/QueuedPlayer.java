@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.UUID;
 
-public class GamePlayer {
+public class QueuedPlayer {
     private Player player;
 
     private String queue = "";
@@ -19,11 +19,11 @@ public class GamePlayer {
 
     private final PlayerData playerData;
 
-    GamePlayer(Player player) {
+    QueuedPlayer(Player player) {
         this(player, new PlayerData(player.getUniqueId(), player.getName()));
     }
 
-    GamePlayer(Player player, PlayerData data) {
+    QueuedPlayer(Player player, PlayerData data) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(data);
 
@@ -158,7 +158,7 @@ public class GamePlayer {
      * Does not physically change their queues.
      *
      * @param queue the name of the queue
-     * @see net.malfact.gamecore.queue.GameQueue#addPlayer(GamePlayer)  GameQueue.addPlayer(GamePlayer)
+     * @see net.malfact.gamecore.queue.GameQueue#addPlayer(QueuedPlayer)  GameQueue.addPlayer(GamePlayer)
      */
     public void setQueue(String queue) {
         if (queue == null)
@@ -188,7 +188,7 @@ public class GamePlayer {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof GamePlayer && this.playerData.uuid.equals(((GamePlayer) obj).playerData.uuid);
+        return obj instanceof QueuedPlayer && this.playerData.uuid.equals(((QueuedPlayer) obj).playerData.uuid);
     }
 
     @Override

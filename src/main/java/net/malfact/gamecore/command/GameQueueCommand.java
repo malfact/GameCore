@@ -4,17 +4,20 @@ import dev.jorel.commandapi.CommandAPIBukkit;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import dev.jorel.commandapi.executors.CommandArguments;
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.player.GamePlayer;
+import net.malfact.gamecore.Messages;
+import net.malfact.gamecore.player.QueuedPlayer;
 import net.malfact.gamecore.queue.GameQueue;
 import net.malfact.gamecore.team.GameTeam;
-import net.malfact.gamecore.Messages;
 import net.malfact.gamecore.util.Validate;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
 
 @SuppressWarnings("ConstantConditions")
 public class GameQueueCommand {
@@ -48,7 +51,7 @@ public class GameQueueCommand {
 
         if (optionalQueue.isPresent()) {
             GameQueue queue = (GameQueue) optionalQueue.get();
-            Set<GamePlayer> players = queue.getPlayers();
+            Set<QueuedPlayer> players = queue.getPlayers();
 
             String[] names = players.stream().map(player -> {
                 boolean online = player.isOnline();
@@ -57,7 +60,7 @@ public class GameQueueCommand {
 
             int online = 0;
 
-            for (GamePlayer player : players) {
+            for (QueuedPlayer player : players) {
                 if (player.isOnline()) online++;
             }
 
@@ -119,7 +122,7 @@ public class GameQueueCommand {
             player = (Player) sender;
         }
 
-        GamePlayer gamePlayer = Validate.isGamePlayer(player);
+        QueuedPlayer gamePlayer = Validate.isGamePlayer(player);
 
         if (queue.hasPlayer(gamePlayer)) {
             if (proxiedCaller != null)
@@ -143,11 +146,11 @@ public class GameQueueCommand {
         if (!queue.getEnabled())
             throw CommandAPIBukkit.failWithAdventureComponent(Messages.get("QUEUE_DISABLED", queue.name));
 
-        GamePlayer[] gamePlayers = players.stream().map(Validate::isGamePlayer).toArray(GamePlayer[]::new);
+        QueuedPlayer[] gamePlayers = players.stream().map(Validate::isGamePlayer).toArray(QueuedPlayer[]::new);
 
         int count = 0;
 
-        for (GamePlayer gamePlayer : gamePlayers) {
+        for (QueuedPlayer gamePlayer : gamePlayers) {
             if (queue.hasPlayer(gamePlayer))
                 continue;
 
@@ -174,7 +177,7 @@ public class GameQueueCommand {
             player = (Player) sender;
         }
 
-        GamePlayer gamePlayer = Validate.isGamePlayer(player);
+        QueuedPlayer gamePlayer = Validate.isGamePlayer(player);
 
         if (gamePlayer.getQueueName().isEmpty()) {
             if (proxiedCaller != null)
@@ -191,7 +194,7 @@ public class GameQueueCommand {
     }
 
     public static void leaveQueueOther(CommandSender sender, CommandArguments arguments) throws WrapperCommandSyntaxException {
-        GamePlayer player = Validate.isGamePlayer((Player) arguments.get("player"));
+        QueuedPlayer player = Validate.isGamePlayer((Player) arguments.get("player"));
 
         if (player.getQueueName().isEmpty())
             throw CommandAPIBukkit.failWithAdventureComponent(Messages.get("PLAYER_NOT_IN_QUEUE", player.getName()));

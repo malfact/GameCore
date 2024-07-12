@@ -1,8 +1,8 @@
 package net.malfact.gamecore.team;
 
-import net.malfact.gamecore.event.PlayerJoinTeamEvent;
-import net.malfact.gamecore.event.PlayerLeaveTeamEvent;
-import net.malfact.gamecore.player.GamePlayer;
+import net.malfact.gamecore.event.player.PlayerJoinTeamEvent;
+import net.malfact.gamecore.event.player.PlayerLeaveTeamEvent;
+import net.malfact.gamecore.player.QueuedPlayer;
 import net.malfact.gamecore.util.DataHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,7 +21,7 @@ import java.util.*;
 public class GameTeam implements DataHolder<TeamData> {
     public final TeamManager teamManager;
     public final String name;
-    private final List<GamePlayer> players;
+    private final List<QueuedPlayer> players;
     private Team handle;
     private Instant handleTime;
 
@@ -86,7 +86,7 @@ public class GameTeam implements DataHolder<TeamData> {
      * Get the GamePlayers currently in this Queue
      * @return a set of GamePlayers in this Queue
      */
-    public Set<GamePlayer> getPlayers() {
+    public Set<QueuedPlayer> getPlayers() {
         return new HashSet<>(players);
     }
 
@@ -95,7 +95,7 @@ public class GameTeam implements DataHolder<TeamData> {
      *
      * @param player the GamePlayer to add
      */
-    public void addPlayer(@NotNull GamePlayer player) {
+    public void addPlayer(@NotNull QueuedPlayer player) {
         if (players.contains(player))
             return;
 
@@ -114,7 +114,7 @@ public class GameTeam implements DataHolder<TeamData> {
      * Removes a GamePlayer from the Team
      * @param player the GamePlayer to remove
      */
-    public void removePlayer(@NotNull GamePlayer player) {
+    public void removePlayer(@NotNull QueuedPlayer player) {
         if (players.isEmpty() || !players.contains(player))
             return;
 
@@ -133,9 +133,9 @@ public class GameTeam implements DataHolder<TeamData> {
             handle().removeEntries(handle().getEntries());
         } catch (IllegalStateException ignored) {}
 
-        Iterator<GamePlayer> iterator = players.iterator();
+        Iterator<QueuedPlayer> iterator = players.iterator();
         while (iterator.hasNext()) {
-            GamePlayer player = iterator.next();
+            QueuedPlayer player = iterator.next();
             teamManager.setPlayerTeam(player.getUniqueId(), null);
             new PlayerLeaveTeamEvent(player, this).callEvent();
 
@@ -156,7 +156,7 @@ public class GameTeam implements DataHolder<TeamData> {
      * @param player the player to check for
      * @return <i>true</i> if player is in team, <i>false</i> otherwise
      */
-    public boolean hasPlayer(GamePlayer player) {
+    public boolean hasPlayer(QueuedPlayer player) {
         if (players.isEmpty())
             return false;
 

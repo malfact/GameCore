@@ -1,23 +1,16 @@
-package net.malfact.gamecore.event;
+package net.malfact.gamecore.event.player;
 
 import net.malfact.gamecore.game.Game;
-import org.bukkit.entity.Player;
+import net.malfact.gamecore.game.player.GamePlayer;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-public class PlayerLeaveGameEvent extends GameEvent {
+public final class PlayerLeaveGameEvent extends PlayerGameEvent {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
 
-    protected final Player player;
-
-    public PlayerLeaveGameEvent(Game game, Player player) {
-        super(game);
-        this.player = player;
-    }
-
-    public Player getPlayer() {
-        return player;
+    public PlayerLeaveGameEvent(Game game, GamePlayer player) {
+        super(game, player);
     }
 
     @SuppressWarnings("unused")

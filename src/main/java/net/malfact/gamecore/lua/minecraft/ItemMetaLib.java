@@ -126,11 +126,6 @@ public final class ItemMetaLib implements LuaLib, TypeHandler<ItemMeta> {
     }
 
     @Override
-    public Class<ItemMeta> getTypeClass() {
-        return ItemMeta.class;
-    }
-
-    @Override
     public LuaValue getUserdataOf(ItemMeta itemMeta) {
         return userdataOf(itemMeta);
     }

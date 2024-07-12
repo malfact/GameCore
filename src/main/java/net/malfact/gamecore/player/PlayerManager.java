@@ -3,8 +3,8 @@ package net.malfact.gamecore.player;
 import com.google.gson.reflect.TypeToken;
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.GameCoreManager;
-import net.malfact.gamecore.event.PlayerJoinTeamEvent;
-import net.malfact.gamecore.event.PlayerLeaveTeamEvent;
+import net.malfact.gamecore.event.player.PlayerJoinTeamEvent;
+import net.malfact.gamecore.event.player.PlayerLeaveTeamEvent;
 import net.malfact.gamecore.team.GameTeam;
 import net.malfact.gamecore.util.Json;
 import net.malfact.gamecore.util.Validate;
@@ -28,7 +28,7 @@ import java.util.UUID;
 
 public final class PlayerManager extends GameCoreManager implements Listener {
 
-    private final Map<UUID, GamePlayer> players;
+    private final Map<UUID, QueuedPlayer> players;
     private final Map<UUID, BukkitTask> cleaningTasks;
     private static final Type dataType = new TypeToken<PlayerData>() {}.getType();
 
@@ -39,7 +39,7 @@ public final class PlayerManager extends GameCoreManager implements Listener {
         cleaningTasks = new HashMap<>();
     }
 
-    public GamePlayer getPlayer(@NotNull Player player) {
+    public QueuedPlayer getPlayer(@NotNull Player player) {
         if (players == null || players.isEmpty())
             return null;
 
@@ -69,7 +69,7 @@ public final class PlayerManager extends GameCoreManager implements Listener {
 
     // Currently nothing will save since they get removed from teams & queues
     // Will probably add option to NOT remove offline players
-    private void cleanPlayer(GamePlayer player) {
+    private void cleanPlayer(QueuedPlayer player) {
         plugin.logInfo("Running Data-Clean on " + player);
         if (player.inSystem()) {
             String queueName = player.getQueueName();
@@ -117,14 +117,14 @@ public final class PlayerManager extends GameCoreManager implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        GamePlayer gamePlayer;
+        QueuedPlayer gamePlayer;
         if (!players.containsKey(uuid)) {
             Optional<PlayerData> playerData = loadPlayerData(uuid);
 
             gamePlayer = playerData.map(
-                data -> new GamePlayer(player, data)
+                data -> new QueuedPlayer(player, data)
             ).orElseGet(
-                () -> new GamePlayer(player)
+                () -> new QueuedPlayer(player)
             );
 
             plugin.logInfo("Loaded Player Data for " + gamePlayer);
@@ -156,7 +156,7 @@ public final class PlayerManager extends GameCoreManager implements Listener {
 
     @EventHandler
     private void onPlayerQuit(@NotNull PlayerQuitEvent event) {
-        GamePlayer gamePlayer = players.get(event.getPlayer().getUniqueId());
+        QueuedPlayer gamePlayer = players.get(event.getPlayer().getUniqueId());
 
         if (gamePlayer == null)
             return;
@@ -183,7 +183,7 @@ public final class PlayerManager extends GameCoreManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerRespawn(@NotNull PlayerRespawnEvent event) {
-        GamePlayer player = Validate.isGamePlayer(event.getPlayer());
+        QueuedPlayer player = Validate.isGamePlayer(event.getPlayer());
 
         player.setDead(false);
 
@@ -202,7 +202,7 @@ public final class PlayerManager extends GameCoreManager implements Listener {
 
     @EventHandler
     private void onPlayerDeath(@NotNull PlayerDeathEvent event) {
-        GamePlayer player = Validate.isGamePlayer(event.getPlayer());
+        QueuedPlayer player = Validate.isGamePlayer(event.getPlayer());
         player.setDead(true);
 
         GameTeam team = player.getTeam();
@@ -215,7 +215,7 @@ public final class PlayerManager extends GameCoreManager implements Listener {
 
     @EventHandler
     private void onPlayerJoinTeam(@NotNull PlayerJoinTeamEvent event) {
-        GamePlayer player = event.getPlayer();
+        QueuedPlayer player = event.getPlayer();
         GameTeam team = event.getTeam();
 
         if (team.getSpawn() != null)
@@ -224,7 +224,7 @@ public final class PlayerManager extends GameCoreManager implements Listener {
 
     @EventHandler
     private void onPlayerLeaveTeam(@NotNull PlayerLeaveTeamEvent event) {
-        GamePlayer player = event.getPlayer();
+        QueuedPlayer player = event.getPlayer();
         GameTeam team = event.getTeam();
 
         if (team.getExit() != null)
@@ -240,7 +240,7 @@ public final class PlayerManager extends GameCoreManager implements Listener {
         };
     }
 
-    private boolean shouldPlayerSpawnOnJoin(GamePlayer player) {
+    private boolean shouldPlayerSpawnOnJoin(QueuedPlayer player) {
         return plugin.getConfig().getBoolean("spawn-on-join",false) && !player.hasPermission("gamecore.ignore-spawn-on-join");
     }
 }

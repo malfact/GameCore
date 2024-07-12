@@ -6,11 +6,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class GameListener implements Listener, EventExecutor {
+public abstract class EventListener implements Listener, EventExecutor {
 
     protected final Game instance;
 
-    public GameListener(Game instance) {
+    public EventListener(Game instance) {
         this.instance = instance;
     }
 

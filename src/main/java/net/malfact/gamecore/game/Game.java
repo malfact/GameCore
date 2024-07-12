@@ -35,6 +35,8 @@ public abstract class Game {
     protected final List<Entity> entities;
     protected final List<Cleanable<?>> cleanables;
 
+    private UUID uuid;
+
     protected Game() {
         this.players = new ArrayList<>();
         this.entities = new ArrayList<>();
@@ -43,6 +45,10 @@ public abstract class Game {
 
     public State getState() {
         return this.state;
+    }
+
+    public UUID getUniqueId() {
+        return uuid;
     }
 
     /**
@@ -134,6 +140,7 @@ public abstract class Game {
 
         entities.add(entity);
         GameCore.logDebug("Registered entity " + entity.getName() + " with game: " + getName());
+
         return true;
     }
 
@@ -182,6 +189,8 @@ public abstract class Game {
         if (state != State.STOPPED)
             return;
 
+        this.uuid = UUID.randomUUID();
+
         state = State.STARTING;
 
         GameCore.logDebug("Starting Game: " + getName());
@@ -196,7 +205,7 @@ public abstract class Game {
 
         state = State.RUNNING;
         gameTask = new GameTask(this);
-        gameTask.runTaskTimer(GameCore.getInstance(), 0, 1);
+        gameTask.runTaskTimer(GameCore.instance(), 0, 1);
     }
 
     /**
@@ -239,19 +248,11 @@ public abstract class Game {
         stop = false;
         state = State.STOPPED;
 
-        this.clean();
-    }
-
-    void clean() {
         for (var entity : entities) {
             entity.remove();
         }
 
         entities.clear();
-
-        for (var player : getPlayers()) {
-            GameCore.gameManager().leaveGame(player);
-        }
 
         cleanables.forEach(Cleanable::clean);
         cleanables.clear();

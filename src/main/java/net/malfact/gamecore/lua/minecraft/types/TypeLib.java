@@ -40,11 +40,6 @@ public abstract class TypeLib<T> implements LuaLib, TypeHandler<T> {
     }
 
     @Override
-    public Class<T> getTypeClass() {
-        return typeClass;
-    }
-
-    @Override
     public final LuaValue getUserdataOf(T o) {
         LuaTable meta = new LuaTable();
 

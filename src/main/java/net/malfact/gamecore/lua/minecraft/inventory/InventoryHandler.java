@@ -139,11 +139,6 @@ public class InventoryHandler<I extends Inventory> implements TypeHandler<I> {
     }
 
     @Override
-    public final Class<I> getTypeClass() {
-        return inventoryClass;
-    }
-
-    @Override
     public final LuaValue getUserdataOf(I object, Game instance) {
         LuaTable meta = new LuaTable();
 

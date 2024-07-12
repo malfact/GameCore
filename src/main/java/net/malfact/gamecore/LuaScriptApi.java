@@ -4,8 +4,8 @@ import net.malfact.gamecore.api.LuaApi;
 import net.malfact.gamecore.api.LuaLib;
 import net.malfact.gamecore.api.ScriptApi;
 import net.malfact.gamecore.api.TypeHandler;
-import net.malfact.gamecore.event.RegisterGlobalLibraryEvent;
-import net.malfact.gamecore.event.RegisterLocalLibraryEvent;
+import net.malfact.gamecore.event.library.RegisterGlobalLibraryEvent;
+import net.malfact.gamecore.event.library.RegisterLocalLibraryEvent;
 import net.malfact.gamecore.game.Game;
 import net.malfact.gamecore.game.ScriptedGame;
 import org.bukkit.Bukkit;
@@ -30,22 +30,23 @@ public final class LuaScriptApi implements LuaApi, ScriptApi {
     private LuaTable globalEnv;
 
     @Override
-    public TypeHandler<?> getTypeHandler(Class<?> clazz) {
-        Class<?> currentClass = clazz;
+    public <T> TypeHandler<? super T> getTypeHandler(T obj) {
+        Class<?> objClass = obj.getClass();
+        Class<?> currentClass = objClass;
         while (currentClass != null) {
             if (typeHandlers.containsKey(currentClass)) {
                 var handler = typeHandlers.get(currentClass);
-                typeHandlers.put(clazz, handler);
-                return handler;
+                typeHandlers.put(objClass, handler);
+                //noinspection unchecked
+                return (TypeHandler<? super T>) handler;
             }
             currentClass = currentClass.getSuperclass();
         }
 
-        GameCore.logger().debug("Did not find handler for {}", clazz.getSimpleName());
+        GameCore.logger().debug("Did not find handler for {}", objClass.getSimpleName());
 
         return null;
     }
-
 
     @Override
     public LuaValue getUserdataOf(Object obj) {
@@ -60,14 +61,14 @@ public final class LuaScriptApi implements LuaApi, ScriptApi {
         if (obj instanceof LuaValue luaValue)
             return luaValue;
 
-        var handler = getTypeHandler(obj.getClass());
+        var handler = getTypeHandler(obj);
         if (handler == null)
             return LuaConstant.NIL;
 
         if (instance == null)
-            return handler.getUserdataOfRaw(obj);
+            return handler.getUserdataOf(obj);
         else
-            return handler.getUserdataOfRaw(obj, instance);
+            return handler.getUserdataOf(obj, instance);
     }
 
 

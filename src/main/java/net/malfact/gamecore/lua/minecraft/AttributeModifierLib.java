@@ -26,11 +26,6 @@ public class AttributeModifierLib implements LuaLib, TypeHandler<AttributeModifi
     }
 
     @Override
-    public Class<AttributeModifier> getTypeClass() {
-        return AttributeModifier.class;
-    }
-
-    @Override
     public LuaValue getUserdataOf(AttributeModifier modifier) {
         LuaTable meta = new LuaTable();
         meta.set(LuaConstant.MetaTag.INDEX, func_modifierIndex);

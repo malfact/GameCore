@@ -2,7 +2,7 @@ package net.malfact.gamecore.queue;
 
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.Messages;
-import net.malfact.gamecore.player.GamePlayer;
+import net.malfact.gamecore.player.QueuedPlayer;
 import net.malfact.gamecore.team.GameTeam;
 import net.malfact.gamecore.util.DataHolder;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ public class GameQueue implements DataHolder<QueueData> {
 
     private boolean enabled = false;
 
-    private final List<GamePlayer> players;
+    private final List<QueuedPlayer> players;
 
 
     GameQueue(String name) {
@@ -46,7 +46,7 @@ public class GameQueue implements DataHolder<QueueData> {
      * Get the GamePlayers currently in this Queue
      * @return a set of GamePlayers in this Queue
      */
-    public Set<GamePlayer> getPlayers() {
+    public Set<QueuedPlayer> getPlayers() {
         return new HashSet<>(players);
     }
 
@@ -55,7 +55,7 @@ public class GameQueue implements DataHolder<QueueData> {
      *
      * @param player the GamePlayer to add
      */
-    public void addPlayer(GamePlayer player) {
+    public void addPlayer(QueuedPlayer player) {
         if (players.contains(player) || !enabled)
             return;
 
@@ -79,7 +79,7 @@ public class GameQueue implements DataHolder<QueueData> {
      *
      * @param player the GamePlayer to remove
      */
-    public void removePlayer(GamePlayer player) {
+    public void removePlayer(QueuedPlayer player) {
         if (!players.contains(player))
             return;
 
@@ -94,7 +94,7 @@ public class GameQueue implements DataHolder<QueueData> {
      * @param player the player to look for
      * @return <i>true</i> if the player is found, <i>false</i> otherwise
      */
-    public boolean hasPlayer(GamePlayer player) {
+    public boolean hasPlayer(QueuedPlayer player) {
         if (!enabled || players.isEmpty())
             return false;
 
@@ -108,9 +108,9 @@ public class GameQueue implements DataHolder<QueueData> {
         if (players.isEmpty())
             return;
 
-        Iterator<GamePlayer> it = players.iterator();
+        Iterator<QueuedPlayer> it = players.iterator();
         while (it.hasNext()) {
-            GamePlayer player = it.next();
+            QueuedPlayer player = it.next();
 
             player.setQueue("");
             player.sendMessage(Messages.get("SELF_LEFT_QUEUE", this.name));
@@ -136,10 +136,10 @@ public class GameQueue implements DataHolder<QueueData> {
     }
 
     public void popWithTag(String tag) {
-        Iterator<GamePlayer> iterator = players.iterator();
+        Iterator<QueuedPlayer> iterator = players.iterator();
 
         while (iterator.hasNext()) {
-            GamePlayer gamePlayer = iterator.next();
+            QueuedPlayer gamePlayer = iterator.next();
 
             gamePlayer.setQueue("");
 
@@ -150,10 +150,10 @@ public class GameQueue implements DataHolder<QueueData> {
     }
 
     public void popWithTeam(@NotNull GameTeam team) {
-        Iterator<GamePlayer> iterator = players.iterator();
+        Iterator<QueuedPlayer> iterator = players.iterator();
 
         while (iterator.hasNext()) {
-            GamePlayer player = iterator.next();
+            QueuedPlayer player = iterator.next();
             team.addPlayer(player);
             player.setQueue("");
             iterator.remove();
@@ -164,11 +164,11 @@ public class GameQueue implements DataHolder<QueueData> {
     public int popWithTeam(@NotNull GameTeam team, int count) {
         Objects.requireNonNull(team);
 
-        Iterator<GamePlayer> iterator = players.iterator();
+        Iterator<QueuedPlayer> iterator = players.iterator();
 
         int popped = 0;
         while (popped < count && iterator.hasNext()) {
-            GamePlayer player = iterator.next();
+            QueuedPlayer player = iterator.next();
             team.addPlayer(player);
             player.setQueue("");
             iterator.remove();

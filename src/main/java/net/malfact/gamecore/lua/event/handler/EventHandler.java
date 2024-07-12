@@ -1,16 +1,13 @@
-package net.malfact.gamecore.lua.event;
+package net.malfact.gamecore.lua.event.handler;
 
 import net.malfact.gamecore.api.TypeHandler;
 import net.malfact.gamecore.game.Game;
+import net.malfact.gamecore.lua.event.EventClass;
+import net.malfact.gamecore.lua.event.EventUserdata;
 import org.bukkit.event.Event;
 import org.luaj.vm2.LuaValue;
 
 public class EventHandler implements TypeHandler<Event> {
-
-    @Override
-    public Class<Event> getTypeClass() {
-        return Event.class;
-    }
 
     @Override
     public LuaValue getUserdataOf(Event object, Game instance) {

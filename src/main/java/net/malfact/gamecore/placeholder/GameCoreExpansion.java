@@ -2,7 +2,7 @@ package net.malfact.gamecore.placeholder;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.player.GamePlayer;
+import net.malfact.gamecore.player.QueuedPlayer;
 import net.malfact.gamecore.queue.GameQueue;
 import net.malfact.gamecore.team.GameTeam;
 import org.bukkit.entity.Player;
@@ -64,12 +64,12 @@ public class GameCoreExpansion extends PlaceholderExpansion {
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String identifier) {
 
         if (identifier.equalsIgnoreCase("player_queue")) {
-            GamePlayer gamePlayer = GameCore.getPlayerManager().getPlayer(player);
+            QueuedPlayer gamePlayer = GameCore.getPlayerManager().getPlayer(player);
 
             return gamePlayer == null ? "none" : gamePlayer.getQueueName();
 
         } else if (identifier.equalsIgnoreCase("player_team")) {
-            GamePlayer gamePlayer = GameCore.getPlayerManager().getPlayer(player);
+            QueuedPlayer gamePlayer = GameCore.getPlayerManager().getPlayer(player);
 
             return gamePlayer == null ? "none" : gamePlayer.getTeamName();
 

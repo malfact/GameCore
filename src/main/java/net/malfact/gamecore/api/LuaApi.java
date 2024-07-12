@@ -12,7 +12,7 @@ import java.util.Locale;
 
 public interface LuaApi {
 
-    TypeHandler<?> getTypeHandler(Class<?> clazz);
+    <T> TypeHandler<? super T> getTypeHandler(T obj);
 
     LuaValue getUserdataOf(Object obj);
 
@@ -90,17 +90,18 @@ public interface LuaApi {
             return v;
 
         return switch (o) {
-            case Boolean v -> valueOf(v);
-            case Integer v -> valueOf(v);
-            case Double v -> valueOf(v);
-            case Character v -> valueOf(v);
-            case Float v -> valueOf(v);
-            case byte[] v -> valueOf(v);
-            case String v -> valueOf(v);
+            case Boolean v ->   valueOf(v.booleanValue());
+            case Integer v ->   valueOf(v.intValue());
+            case Double v ->    valueOf(v.doubleValue());
+            case Character v -> valueOf(v.charValue());
+            case Float v ->     valueOf(v.floatValue());
+            case Long v ->      valueOf(v.longValue());
+            case byte[] v ->    valueOf(v);
+            case String v ->    valueOf(v);
             case Component v -> valueOf(v);
-            case Keyed v -> LuaValue.valueOf(v.getKey().asMinimalString().toLowerCase(Locale.ROOT));
-            case Enum<?> v -> LuaValue.valueOf(v.toString().toLowerCase(Locale.ROOT));
-            default -> LuaConstant.NIL;
+            case Keyed v ->     LuaValue.valueOf(v.getKey().asMinimalString().toLowerCase(Locale.ROOT));
+            case Enum<?> v ->   LuaValue.valueOf(v.toString().toLowerCase(Locale.ROOT));
+            default ->          LuaConstant.NIL;
         };
     }
 

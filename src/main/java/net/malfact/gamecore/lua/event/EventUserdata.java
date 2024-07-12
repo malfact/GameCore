@@ -10,7 +10,7 @@ public class EventUserdata extends LuaUserdata {
     private final EventClass eventClass;
     private final Game instance;
 
-    EventUserdata(Game instance, EventClass eventClass, Event event) {
+    public EventUserdata(Game instance, EventClass eventClass, Event event) {
         super(event);
         this.eventClass = eventClass;
         this.instance = instance;

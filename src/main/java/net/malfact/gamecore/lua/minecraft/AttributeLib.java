@@ -19,11 +19,6 @@ public class AttributeLib implements LuaLib, TypeHandler<AttributeInstance> {
     private final LuaFunction func_removeModifier =     LuaUtil.toFunction(this::removeModifier);
 
     @Override
-    public Class<AttributeInstance> getTypeClass() {
-        return AttributeInstance.class;
-    }
-
-    @Override
     public LuaValue getUserdataOf(AttributeInstance attribute) {
         LuaTable meta = new LuaTable();
         meta.set(LuaConstant.MetaTag.INDEX, func_attributeOnIndex);

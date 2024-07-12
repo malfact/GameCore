@@ -24,7 +24,7 @@ public class GameCommands {
         if (GameCore.gameManager().getGame(name) != null)
             throw CommandAPIBukkit.failWithAdventureComponent(Messages.get("GAME_ALREADY_LOADED", name));
 
-        Path gamePath = Paths.get(GameCore.getInstance().getDataFolder() + "/games/" + name + ".lua");
+        Path gamePath = Paths.get(GameCore.instance().getDataFolder() + "/games/" + name + ".lua");
         File file = gamePath.toFile();
 
         if (!file.exists())

@@ -3,8 +3,8 @@ package net.malfact.gamecore.game;
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.LuaScript;
 import net.malfact.gamecore.api.LuaApi;
+import net.malfact.gamecore.lua.event.EventListener;
 import net.malfact.gamecore.lua.event.EventRegistry;
-import net.malfact.gamecore.lua.event.GameListener;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -33,7 +33,7 @@ public class ScriptedGame extends Game {
         this.displayName = name;
     }
 
-    public GameListener getFunctionCallback(LuaFunction function) {
+    public EventListener getFunctionCallback(LuaFunction function) {
         if (callbacks == null)
             callbacks = new ArrayList<>();
 
@@ -59,7 +59,7 @@ public class ScriptedGame extends Game {
     @Override
     protected void onStart() {
         if (!script.run()){
-            GameCore.getInstance().logError("Problem in " + getName() + ": Stopping.");
+            GameCore.instance().logError("Problem in " + getName() + ": Stopping.");
             stop();
         }
     }
@@ -105,7 +105,7 @@ public class ScriptedGame extends Game {
 
     private record SavedBlockData(Location location, BlockData blockData){}
 
-    private class FunctionCallback extends GameListener {
+    private class FunctionCallback extends EventListener {
 
         private final LuaFunction function;
 
