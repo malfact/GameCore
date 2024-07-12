@@ -3,7 +3,9 @@ package net.malfact.gamecore.game;
 import io.papermc.paper.event.player.PlayerNameEntityEvent;
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.event.*;
+import net.malfact.gamecore.event.GameStartEvent;
+import net.malfact.gamecore.event.GameStopEvent;
+import net.malfact.gamecore.event.GameTickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.boss.BossBar;
@@ -66,58 +68,17 @@ public abstract class Game {
     public abstract void setDisplayName(String name);
 
     /**
-     * Add a player to this game.
-     * <p>
-     *     Fires {@link PlayerJoinGameEvent}
-     * </p>
-     * @param player the player
-     */
-    final void joinGame(Player player) {
-        if (players.contains(player.getUniqueId()))
-            return;
-
-        GameCore.logger().debug("Registered player {} with game: {}", player.getName(), getName());
-        players.add(player.getUniqueId());
-        Bukkit.getPluginManager().callEvent(new PlayerJoinGameEvent(this, player));
-    }
-
-    /**
-     * Remove a player from this game.
-     * <p>
-     *     Fires {@link PlayerLeaveGameEvent}
-     * </p>
-     * @param player the player
-     */
-    final void leaveGame(Player player) {
-        if (!players.contains(player.getUniqueId()))
-            return;
-
-        GameCore.logger().debug("Unregistered player {} with game: {}", player.getName(), getName());
-        Bukkit.getPluginManager().callEvent(new PlayerLeaveGameEvent(this, player));
-        players.remove(player.getUniqueId());
-    }
-
-    /**
-     * Gets if a player is currently in this game.
-     * @param player the player
-     * @return {@code true} if the player in this game, otherwise {@code false}
-     */
-    public boolean hasPlayer(Player player) {
-        return players.contains(player.getUniqueId());
-    }
-
-    /**
      * Gets if an entity is currently registered to this game.
      * <p><i>
      *     <b>Note:</b><br>
-     *     Automatically passed to {@link #hasPlayer(Player)} if the entity is a player.
+     *     Automatically passed to {@link GameManager#isPlayerInGame(Player, Game)} if the entity is a player.
      * </i></p>
      * @param entity the entity
      * @return {@code true} if the entity is registered, otherwise {@code false}
      */
     public boolean hasEntity(Entity entity) {
         if (entity instanceof Player player)
-            return hasPlayer(player);
+            return GameCore.gameManager().isPlayerInGame(player, this);
 
         return entities.contains(entity);
     }
@@ -126,7 +87,7 @@ public abstract class Game {
      * Registers an entity to this game.
      * <p><i>
      *     <b>Note:</b><br>
-     *     Automatically passed to {@link #joinGame(Player)} if the entity is a player.
+     *     Automatically passed to {@link GameManager#joinGame(Player, Game)} if the entity is a player.
      * </i></p>
      * @param entity the entity
      * @return {@code true} if successful, otherwise {@code false}
@@ -148,7 +109,7 @@ public abstract class Game {
      * Unregisters an entity to this game.
      * <p><i>
      *     <b>Note:</b><br>
-     *     Automatically passed to {@link #leaveGame(Player)} if the entity is a player.
+     *     Automatically passed to {@link GameManager#leaveGame(Player)} if the entity is a player.
      * </i></p>
      * @param entity the entity
      * @return {@code true} if successful, otherwise {@code false}
@@ -258,6 +219,8 @@ public abstract class Game {
         cleanables.clear();
 
         this.onClean();
+
+        GameCore.gameManager().onGameStopped(this);
     }
 
     /**
@@ -288,14 +251,15 @@ public abstract class Game {
      * Helper method for event dispatching
      */
     public final boolean acceptsEvent(Event event) {
+        var manager = GameCore.gameManager();
         return switch (event) {
-            case PlayerInteractEntityEvent e -> hasPlayer(e.getPlayer()) || hasEntity(e.getRightClicked());
-            case PlayerShearEntityEvent e ->    hasPlayer(e.getPlayer()) || hasEntity(e.getEntity());
-            case PlayerLeashEntityEvent e ->    hasPlayer(e.getPlayer()) || hasEntity(e.getEntity());
-            case PlayerNameEntityEvent e ->     hasPlayer(e.getPlayer()) || hasEntity(e.getEntity());
-            case PrePlayerAttackEntityEvent e -> hasPlayer(e.getPlayer()) || hasEntity(e.getAttacked());
+            case PlayerInteractEntityEvent e -> manager.isPlayerInGame(e.getPlayer()) || hasEntity(e.getRightClicked());
+            case PlayerShearEntityEvent e ->    manager.isPlayerInGame(e.getPlayer()) || hasEntity(e.getEntity());
+            case PlayerLeashEntityEvent e ->    manager.isPlayerInGame(e.getPlayer()) || hasEntity(e.getEntity());
+            case PlayerNameEntityEvent e ->     manager.isPlayerInGame(e.getPlayer()) || hasEntity(e.getEntity());
+            case PrePlayerAttackEntityEvent e -> manager.isPlayerInGame(e.getPlayer()) || hasEntity(e.getAttacked());
+            case PlayerEvent e ->               manager.isPlayerInGame(e.getPlayer());
             case EntityDamageByEntityEvent e -> hasEntity(e.getEntity()) || hasEntity(e.getDamager());
-            case PlayerEvent e ->               hasPlayer(e.getPlayer());
             case EntityEvent e ->               hasEntity(e.getEntity());
             case VehicleEvent e ->              hasEntity(e.getVehicle());
             default -> true;
@@ -392,6 +356,28 @@ public abstract class Game {
     }
 
     public abstract void registerBlockChange(Location loc);
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+
+        if (obj instanceof Game other) {
+            // If both names do not match -> false
+            if (!this.getName().equals(other.getName()))
+                return false;
+
+            // If both are active -> Compare instance uuid
+            // Otherwise:
+            //   If both active value match -> true
+            //   Otherwise: -> false
+            return (this.isActive() && other.isActive())
+                ? this.uuid.equals(other.uuid)
+                : this.isActive() == other.isActive();
+        }
+
+        return false;
+    }
 
     @Override
     public String toString() {

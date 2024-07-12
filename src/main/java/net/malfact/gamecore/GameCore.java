@@ -39,6 +39,7 @@ public final class GameCore extends JavaPlugin {
     private PlayerManager playerManager;
     private GameManager gameManager;
     private DataManager dataManager;
+    private EntityManager entityManager;
 
     private LuaScriptApi luaApi;
 
@@ -90,6 +91,7 @@ public final class GameCore extends JavaPlugin {
         playerManager = new PlayerManager(this);
         gameManager = new GameManager(this);
         dataManager = new DataManager(this);
+        entityManager = new EntityManager();
 
         queueManager.load();
         teamManager.load();
@@ -99,7 +101,9 @@ public final class GameCore extends JavaPlugin {
         getServer().getScheduler().scheduleSyncDelayedTask(this, this::postEnable);
 
         getServer().getPluginManager().registerEvents(new CoreApiPlugin(), this);
+        getServer().getPluginManager().registerEvents(gameManager, this);
         getServer().getPluginManager().registerEvents(playerManager, this);
+        getServer().getPluginManager().registerEvents(entityManager, this);
         logInfo("Registered Event Handlers");
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
@@ -192,7 +196,7 @@ public final class GameCore extends JavaPlugin {
         instance.logInfo("Reloaded 'messages.yml'");
     }
 
-    public static GameCore getInstance() {
+    public static GameCore instance() {
         return instance;
     }
 
@@ -230,5 +234,9 @@ public final class GameCore extends JavaPlugin {
 
     public static DataManager getDataManager() {
         return instance.dataManager;
+    }
+
+    public static EntityManager entityManager() {
+        return instance.entityManager;
     }
 }

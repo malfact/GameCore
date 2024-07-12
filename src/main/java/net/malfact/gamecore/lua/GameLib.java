@@ -4,6 +4,7 @@ import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.api.LuaApi;
 import net.malfact.gamecore.api.LuaUtil;
 import net.malfact.gamecore.game.Game;
+import net.malfact.gamecore.game.player.PlayerProxy;
 import net.malfact.gamecore.lua.event.EventLib;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -66,7 +67,7 @@ public class GameLib extends EventLib {
     }
 
     private LuaValue getPlayers() {
-        Player[] players = instance.getPlayers();
+        PlayerProxy[] players = GameCore.gameManager().getPlayers(instance);
 
         LuaTable table = new LuaTable();
         int i = 1;
