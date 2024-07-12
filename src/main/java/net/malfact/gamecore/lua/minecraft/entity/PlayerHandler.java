@@ -5,16 +5,21 @@ import io.papermc.paper.math.Position;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.util.TriState;
+import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.Vector3;
 import net.malfact.gamecore.api.LuaApi;
 import net.malfact.gamecore.api.LuaUtil;
+import net.malfact.gamecore.api.TypeHandler;
 import net.malfact.gamecore.game.Game;
+import net.malfact.gamecore.game.player.PlayerProxy;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.luaj.vm2.*;
 
 public class PlayerHandler extends HumanEntityHandler<Player> {
+
+    public final GamePlayerHandler GamePlayerHandler;
 
     private final LuaFunction func_sendMessageRaw =             LuaUtil.toVarargFunction(this::sendMessageRaw);
     private final LuaFunction func_sendMessage =                LuaUtil.toVarargFunction(this::sendMessage);
@@ -43,6 +48,7 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
 
     public PlayerHandler() {
         super(Player.class);
+        this.GamePlayerHandler = new GamePlayerHandler();
     }
 
     @Override
@@ -168,14 +174,87 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
             return super.getUnregistered(player, key);
     }
 
+//    @Override
+//    protected String toString(Player player) {
+//        return LuaUtil.fromComponent(player.name());
+//    }
+
     @Override
-    protected String toString(Player player) {
-        return LuaUtil.fromComponent(player.name());
+    public LuaValue getUserdataOf(Player player) {
+        PlayerProxy proxy = GameCore.gameManager().getPlayer(player.getUniqueId());
+        if (!proxy.isValid())
+            return super.getUserdataOf(player); // ToDo UninstancedPlayer
+
+        return this.GamePlayerHandler.getUserdataOf(proxy);
     }
 
     @Override
-    protected String type() {
-        return "player";
+    public LuaValue getUserdataOf(Player player, Game instance) {
+        return getUserdataOf(player);
+    }
+
+    public class GamePlayerHandler implements TypeHandler<PlayerProxy> {
+
+        private final LuaFunction func_index =      LuaUtil.toFunction(this::onIndex);
+        private final LuaFunction func_newindex =   LuaUtil.toFunction(this::onNewIndex);
+        private final LuaFunction func_tostring =   LuaUtil.toFunction(this::onToString);
+        private final LuaFunction func_equals =     LuaUtil.toFunction(this::onEquals);
+
+        private GamePlayerHandler() {}
+
+        @Override
+        public LuaValue getUserdataOf(PlayerProxy player) {
+            LuaTable meta = new LuaTable();
+
+            meta.set(LuaConstant.MetaTag.INDEX,     func_index);
+            meta.set(LuaConstant.MetaTag.NEWINDEX,  func_newindex);
+            meta.set(LuaConstant.MetaTag.TOSTRING,  func_tostring);
+            meta.set(LuaConstant.MetaTag.EQ,        func_equals);
+
+            meta.set("__userdata_type__",  "player");
+
+            return new LuaUserdata(player, meta);
+        }
+
+        private LuaValue onIndex(LuaValue self, LuaValue key) {
+            if (!key.isstring())
+                return LuaConstant.NIL;
+
+            PlayerProxy player = self.checkuserdata(PlayerProxy.class);
+            return switch (key.tojstring()) {
+                case "name" -> player.isValid() ? LuaApi.valueOf(player.getPlayer().name()) : LuaApi.valueOf(player.getName());
+                case "uuid" -> LuaApi.valueOf(player.getUniqueId().toString());
+                case "isOnline" -> LuaApi.valueOf(player.isOnline());
+                case "timeOffline" -> LuaApi.valueOf(player.getTimeOffline());
+                case "isDead" -> LuaApi.valueOf(player.isDead());
+                case "isValid" -> LuaApi.valueOf(player.isValid());
+                case "isTracked" -> LuaApi.valueOf(player.isTracked());
+                default -> player.isValid()
+                    ? PlayerHandler.this.get(player.getGame(), player.getPlayer(), key.tojstring())
+                    : LuaConstant.NIL;
+            };
+        }
+
+        private void onNewIndex(LuaValue self, LuaValue key, LuaValue value) {
+            if (!key.isstring())
+                return;
+
+            PlayerProxy player = self.checkuserdata(PlayerProxy.class);
+            if (player.isValid())
+                PlayerHandler.this.set(player.getGame(), player.getPlayer(), key.tojstring(), value);
+        }
+
+        private LuaValue onToString(LuaValue self) {
+            PlayerProxy player = self.checkuserdata(PlayerProxy.class);
+            if (player.isValid())
+                return LuaApi.valueOf(player.getPlayer().name());
+            else
+                return LuaApi.valueOf(player.getName());
+        }
+
+        private LuaValue onEquals(LuaValue self, LuaValue other) {
+            return LuaApi.valueOf(self.touserdata().equals(other.touserdata()));
+        }
     }
 
     private void sendMessageRaw(Varargs args) {
