@@ -1,4 +1,4 @@
-package net.malfact.gamecore.placeholder;
+package net.malfact.gamecore.compat.placeholderapi;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.malfact.gamecore.GameCore;
