@@ -1,7 +1,7 @@
 package net.malfact.gamecore.event.player;
 
 import net.malfact.gamecore.game.Game;
-import net.malfact.gamecore.game.player.GamePlayer;
+import net.malfact.gamecore.game.player.PlayerProxy;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +10,7 @@ public final class PlayerJoinGameEvent extends PlayerGameEvent {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
 
-    public PlayerJoinGameEvent(Game game, GamePlayer player) {
+    public PlayerJoinGameEvent(Game game, PlayerProxy player) {
         super(game, player);
     }
 

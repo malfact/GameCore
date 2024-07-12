@@ -5,11 +5,11 @@ import net.malfact.gamecore.game.player.PlayerProxy;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-public final class PlayerLeaveGameEvent extends PlayerGameEvent {
+public class PlayerSpawnEvent extends PlayerGameEvent {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
 
-    public PlayerLeaveGameEvent(Game game, PlayerProxy player) {
+    public PlayerSpawnEvent(Game game, PlayerProxy player) {
         super(game, player);
     }
 
@@ -22,5 +22,4 @@ public final class PlayerLeaveGameEvent extends PlayerGameEvent {
     public @NotNull HandlerList getHandlers() {
         return HANDLER_LIST;
     }
-
 }
