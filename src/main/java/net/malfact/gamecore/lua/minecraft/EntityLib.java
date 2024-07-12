@@ -50,7 +50,7 @@ public final class EntityLib extends EventLib {
         if (!type.isEnabledByFeature(location.getWorld()))
             return LuaConstant.NIL;
 
-        Entity entity = location.getWorld().createEntity(location, type.getEntityClass());
+        Entity entity = GameCore.entityManager().createEntity(instance, location, type.getEntityClass());
         instance.registerEntity(entity);
 
         return LuaApi.userdataOf(entity, instance);
