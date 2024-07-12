@@ -5,11 +5,11 @@ import org.bukkit.event.Event;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-final class EventClass {
+public final class EventClass {
 
     private static final Map<Class<? extends Event>, EventClass> EVENT_CLASSES = new HashMap<>();
 
-    static EventClass of(Class<? extends Event> clazz) {
+    public static EventClass of(Class<? extends Event> clazz) {
         return EVENT_CLASSES.computeIfAbsent(clazz, k -> new EventClass(clazz));
     }
 
@@ -22,10 +22,10 @@ final class EventClass {
 
     private static final String[] IGNORED_METHODS = {
         "getHandlers", "callEvent",
-        "toString", "getClass", "hashCode", "equals", "clone", "notify", "notifyAll", "wait", "finalize"
+        "toString", "getClass", "hashCode", "equals", "clone", "notify", "notifyAll", "wait", "finalize",
     };
 
-    EventMethod getMethod(String key) {
+    public EventMethod getMethod(String key) {
         if (classMethods == null) {
             Map<String, List<EventMethod>> methodLists = new HashMap<>();
 

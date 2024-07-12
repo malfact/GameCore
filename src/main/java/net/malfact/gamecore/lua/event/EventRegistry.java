@@ -8,7 +8,10 @@ import io.papermc.paper.event.entity.EntityKnockbackEvent;
 import io.papermc.paper.event.entity.*;
 import io.papermc.paper.event.player.*;
 import net.malfact.gamecore.GameCore;
-import net.malfact.gamecore.event.*;
+import net.malfact.gamecore.event.GameStartEvent;
+import net.malfact.gamecore.event.GameStopEvent;
+import net.malfact.gamecore.event.GameTickEvent;
+import net.malfact.gamecore.event.player.*;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
@@ -16,7 +19,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.*;
-import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -29,61 +31,64 @@ public class EventRegistry {
     // Game Events
     static {
         // gamecore.event
-        registerEvent("game", "onGameStart", GameStartEvent.class);
-        registerEvent("game", "onGameStop", GameStopEvent.class);
-        registerEvent("game", "onGameTick", GameTickEvent.class);
-        registerEvent("game", "onPlayerJoin", PlayerJoinGameEvent.class);
-        registerEvent("game", "onPlayerLeave", PlayerLeaveGameEvent.class);
+        registerEvent("game", "onGameStart",        GameStartEvent.class);
+        registerEvent("game", "onGameStop",         GameStopEvent.class);
+        registerEvent("game", "onGameTick",         GameTickEvent.class);
+        registerEvent("game", "onPlayerJoin",       PlayerJoinGameEvent.class);
+        registerEvent("game", "onPlayerLeave",      PlayerLeaveGameEvent.class);
+        registerEvent("game", "onPlayerConnect",    PlayerConnectEvent.class);    // PlayerSpawnLocationEvent
+        registerEvent("game", "onPlayerDisconnect", PlayerDisconnectEvent.class); // PlayerQuitEvent
+        registerEvent("game", "onPlayerSpawn",      PlayerSpawnEvent.class);      // PlayerJoinEvent
     }
 
     // Player Events
     static {
         // bukkit.event.player
-        registerEvent("player", "onBedEnter", PlayerBedEnterEvent.class);
-        registerEvent("player", "onBedLeave", PlayerBedLeaveEvent.class);
-        registerEvent("player", "onBucketEmpty", PlayerBucketEmptyEvent.class);
-        registerEvent("player", "onBucketEntity", PlayerBucketEntityEvent.class);
-        registerEvent("player", "onBucketFill", PlayerBucketFillEvent.class);
-        registerEvent("player", "onChangedWorld", PlayerChangedWorldEvent.class);
-        registerEvent("player", "onDropItem", PlayerDropItemEvent.class);
-        registerEvent("player", "onEditBook", PlayerEditBookEvent.class);
-        registerEvent("player", "onEggThrow", PlayerEggThrowEvent.class);
-        registerEvent("player", "onExpChange", PlayerExpChangeEvent.class);
+        registerEvent("player", "onBedEnter",       PlayerBedEnterEvent.class);
+        registerEvent("player", "onBedLeave",       PlayerBedLeaveEvent.class);
+        registerEvent("player", "onBucketEmpty",    PlayerBucketEmptyEvent.class);
+        registerEvent("player", "onBucketEntity",   PlayerBucketEntityEvent.class);
+        registerEvent("player", "onBucketFill",     PlayerBucketFillEvent.class);
+        registerEvent("player", "onChangedWorld",   PlayerChangedWorldEvent.class);
+        registerEvent("player", "onDropItem",       PlayerDropItemEvent.class);
+        registerEvent("player", "onEditBook",       PlayerEditBookEvent.class);
+        registerEvent("player", "onEggThrow",       PlayerEggThrowEvent.class);
+        registerEvent("player", "onExpChange",      PlayerExpChangeEvent.class);
         registerEvent("player", "onExpCooldownChange", PlayerExpCooldownChangeEvent.class);
-        registerEvent("player", "onFish", PlayerFishEvent.class);
+        registerEvent("player", "onFish",           PlayerFishEvent.class);
         registerEvent("player", "onGameModeChange", PlayerGameModeChangeEvent.class);
         registerEvent("player", "onInteractAtEntity", PlayerInteractAtEntityEvent.class);
         registerEvent("player", "onInteractEntity", PlayerInteractEntityEvent.class);
-        registerEvent("player", "onInteract", PlayerInteractEvent.class);
-        registerEvent("player", "onItemBreak", PlayerItemBreakEvent.class);
-        registerEvent("player", "onItemConsume", PlayerItemConsumeEvent.class);
-        registerEvent("player", "onItemDamage", PlayerItemDamageEvent.class);
-        registerEvent("player", "onItemHeld", PlayerItemHeldEvent.class);
-        registerEvent("player", "onItemMend", PlayerItemMendEvent.class);
-        registerEvent("player", "onJoin", PlayerJoinEvent.class);
-        registerEvent("player", "onKick", PlayerKickEvent.class);
-        registerEvent("player", "onLevelChange", PlayerLevelChangeEvent.class);
-        registerEvent("player", "onMove", PlayerMoveEvent.class);
-        registerEvent("player", "onPickupArrow", PlayerPickupArrowEvent.class);
-        registerEvent("player", "onPortal", PlayerPortalEvent.class);
-        registerEvent("player", "onQuit", PlayerQuitEvent.class);
-        registerEvent("player", "onRespawn", PlayerRespawnEvent.class);
-        registerEvent("player", "onRiptide", PlayerRiptideEvent.class);
-        registerEvent("player", "onShearEntity", PlayerShearEntityEvent.class);
-        registerEvent("player", "onSwapHandItems", PlayerSwapHandItemsEvent.class);
+        registerEvent("player", "onInteract",       PlayerInteractEvent.class);
+        registerEvent("player", "onItemBreak",      PlayerItemBreakEvent.class);
+        registerEvent("player", "onItemConsume",    PlayerItemConsumeEvent.class);
+        registerEvent("player", "onItemDamage",     PlayerItemDamageEvent.class);
+        registerEvent("player", "onItemHeld",       PlayerItemHeldEvent.class);
+        registerEvent("player", "onItemMend",       PlayerItemMendEvent.class);
+//        registerEvent("player", "onJoin",           PlayerJoinEvent.class); // GameCore:PlayerSpawnEvent
+        registerEvent("player", "onKick",           PlayerKickEvent.class);
+        registerEvent("player", "onLevelChange",    PlayerLevelChangeEvent.class);
+        registerEvent("player", "onMove",           PlayerMoveEvent.class);
+        registerEvent("player", "onPickupArrow",    PlayerPickupArrowEvent.class);
+        registerEvent("player", "onPortal",         PlayerPortalEvent.class);
+//        registerEvent("player", "onQuit", PlayerQuitEvent.class); // GameCore:PlayerDisconnectEvent
+        registerEvent("player", "onRespawn",        PlayerRespawnEvent.class);
+        registerEvent("player", "onRiptide",        PlayerRiptideEvent.class);
+        registerEvent("player", "onShearEntity",    PlayerShearEntityEvent.class);
+        registerEvent("player", "onSwapHandItems",  PlayerSwapHandItemsEvent.class);
         registerEvent("player", "onTakeLecternBook", PlayerTakeLecternBookEvent.class);
-        registerEvent("player", "onTeleport", PlayerTeleportEvent.class);
-        registerEvent("player", "onToggleFlight", PlayerToggleFlightEvent.class);
-        registerEvent("player", "onToggleSneak", PlayerToggleSneakEvent.class);
-        registerEvent("player", "onToggleSprint", PlayerToggleSprintEvent.class);
-        registerEvent("player", "onUnleashEntity", PlayerUnleashEntityEvent.class);
-        registerEvent("player", "onVelocity", PlayerVelocityEvent.class);
+        registerEvent("player", "onTeleport",       PlayerTeleportEvent.class);
+        registerEvent("player", "onToggleFlight",   PlayerToggleFlightEvent.class);
+        registerEvent("player", "onToggleSneak",    PlayerToggleSneakEvent.class);
+        registerEvent("player", "onToggleSprint",   PlayerToggleSprintEvent.class);
+        registerEvent("player", "onUnleashEntity",  PlayerUnleashEntityEvent.class);
+        registerEvent("player", "onVelocity",       PlayerVelocityEvent.class);
 
         registerEvent("player", "onDeath", PlayerDeathEvent.class);
         registerEvent("player", "onLeashEntity", PlayerLeashEntityEvent.class);
 
         // spigot.event.player
-        registerEvent("player", "onSpawnLocation", PlayerSpawnLocationEvent.class);
+//        registerEvent("player", "onSpawnLocation", PlayerSpawnLocationEvent.class); // GameCore:PlayerConnectEvent
 
         // destroystokyo.paper.event.player
         registerEvent("player", "onArmorChange", PlayerArmorChangeEvent.class);
@@ -304,7 +309,7 @@ public class EventRegistry {
         return entries.get(name);
     }
 
-    public static void unregisterListener(GameListener listener) {
+    public static void unregisterListener(EventListener listener) {
         for (var type : REGISTRY.values()) {
             for (var event : type.values()) {
                 event.unregisterListener(listener);
@@ -316,7 +321,7 @@ public class EventRegistry {
 
         public final String name;
         public final Class<? extends Event> eventClass;
-        private final List<GameListener> listeners;
+        private final List<EventListener> listeners;
 
         private EventEntry(String name, Class<? extends Event> eventClass) {
             this.name = name;
@@ -325,16 +330,16 @@ public class EventRegistry {
             listeners = new ArrayList<>();
         }
 
-        public void registerListener(GameListener listener) {
+        public void registerListener(EventListener listener) {
             if (listeners.contains(listener))
                 return;
 
             listeners.add(listener);
-            Bukkit.getPluginManager().registerEvent(eventClass, listener, EventPriority.NORMAL, listener, GameCore.getInstance());
+            Bukkit.getPluginManager().registerEvent(eventClass, listener, EventPriority.NORMAL, listener, GameCore.instance());
             GameCore.logger().debug("Registered Listener for {}", eventClass.getSimpleName());
         }
 
-        public void unregisterListener(GameListener listener) {
+        public void unregisterListener(EventListener listener) {
             if (!listeners.contains(listener))
                 return;
 

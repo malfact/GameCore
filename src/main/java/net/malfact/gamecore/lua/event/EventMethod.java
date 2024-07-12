@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Comparator;
 
-abstract class EventMethod {
+public abstract class EventMethod {
 
     static EventMethod of(Method method) {
         return new SingleMethod(method);
@@ -26,7 +26,7 @@ abstract class EventMethod {
         this.name = name;
     }
 
-    protected abstract Object invokeMethod(Event instance, Object[] args);
+    public abstract Object invokeMethod(Event instance, Object[] args);
 
     protected int argCount() {
         return -1;
@@ -83,7 +83,7 @@ abstract class EventMethod {
         }
 
         @Override
-        protected Object invokeMethod(Event instance, Object[] args) {
+        public Object invokeMethod(Event instance, Object[] args) {
             // Account for components >:(
             for (int i = 0; i < Math.min(args.length, argCount); i++) {
                 if (args[i] == null || !ComponentLike.class.isAssignableFrom(argTypes[i])) {
@@ -111,7 +111,7 @@ abstract class EventMethod {
         }
 
         @Override
-        protected Object invokeMethod(Event instance, Object[] args) {
+        public Object invokeMethod(Event instance, Object[] args) {
             int score = -1;
             EventMethod best = null;
             for (var method : methods) {
