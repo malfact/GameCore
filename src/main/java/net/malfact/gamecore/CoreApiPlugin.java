@@ -1,13 +1,17 @@
 package net.malfact.gamecore;
 
-import net.malfact.gamecore.event.RegisterGlobalLibraryEvent;
-import net.malfact.gamecore.event.RegisterLocalLibraryEvent;
+import net.malfact.gamecore.event.GameEvent;
+import net.malfact.gamecore.event.library.RegisterGlobalLibraryEvent;
+import net.malfact.gamecore.event.library.RegisterLocalLibraryEvent;
 import net.malfact.gamecore.game.Game;
+import net.malfact.gamecore.game.player.PlayerProxy;
 import net.malfact.gamecore.lua.DataStoreLib;
 import net.malfact.gamecore.lua.EnvGlobalLib;
 import net.malfact.gamecore.lua.GameLib;
 import net.malfact.gamecore.lua.Vector3Lib;
-import net.malfact.gamecore.lua.event.EventHandler;
+import net.malfact.gamecore.lua.event.handler.EventHandler;
+import net.malfact.gamecore.lua.event.handler.GameEventHandler;
+import net.malfact.gamecore.lua.event.handler.PlayerEventHandler;
 import net.malfact.gamecore.lua.minecraft.*;
 import net.malfact.gamecore.lua.minecraft.entity.*;
 import net.malfact.gamecore.lua.minecraft.inventory.InventoryHandler;
@@ -26,6 +30,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -95,17 +100,25 @@ class CoreApiPlugin implements Listener {
         event.registerTypeHandler(new EntityHandler<>(Entity.class), Entity.class, CraftClass.forName("entity.CraftEntity"));
         event.registerTypeHandler(new LivingEntityHandler<>(LivingEntity.class), LivingEntity.class, CraftClass.forName("entity.CraftLivingEntity"));
         event.registerTypeHandler(new HumanEntityHandler<>(HumanEntity.class), HumanEntity.class, CraftClass.forName("entity.CraftHumanEntity"));
-        event.registerTypeHandler(new PlayerHandler(), Player.class, CraftClass.forName("entity.CraftPlayer"));
         event.registerTypeHandler(new ItemEntityHandler(), Item.class, CraftClass.forName("entity.CraftItem"));
         event.registerTypeHandler(new DisplayHandler<>(Display.class), Display.class, CraftClass.forName("entity.CraftDisplay"));
         event.registerTypeHandler(new TextDisplayHandler(), TextDisplay.class, CraftClass.forName("entity.CraftTextDisplay"));
+        // Both PlayerHandler and GamePlayerHandler depends on each other
+        // PlayerHandler will get the appropriate GamePlayer object,
+        // GamePlayerHandler creates the userdata and calls PlayerHandler's get/set if the GamePlayer is valid.
+        // This will be improved when Entities are wrapped.
+        var playerHandler = new PlayerHandler();
+        event.registerTypeHandler(playerHandler, Player.class, CraftClass.forName("entity.CraftPlayer"));
+        event.registerTypeHandler(playerHandler.GamePlayerHandler, PlayerProxy.class);
 
         event.registerTypeHandler(new InventoryHandler<>(Inventory.class), Inventory.class, CraftClass.forName("inventory.CraftInventory"));
         event.registerTypeHandler(new PlayerInventoryHandler(), PlayerInventory.class, CraftClass.forName("inventory.CraftPlayerInventory"));
 
         //noinspection UnstableApiUsage
         event.registerTypeHandler(new DamageSourceHandler(), DamageSource.class, CraftClass.forName("damage.CraftDamageSource"));
-        event.registerTypeHandler(new EventHandler(), Event.class);
+        event.registerTypeHandler(new EventHandler(), Event.class);             // Basic Events
+        event.registerTypeHandler(new PlayerEventHandler(), PlayerEvent.class); // Player Events
+        event.registerTypeHandler(new GameEventHandler(), GameEvent.class);     // GameCore Game Events
 
         event.registerTypeHandler(BossBarLib.HANDLER, BossBar.class, CraftClass.forName("boss.CraftBossBar"));
     }
