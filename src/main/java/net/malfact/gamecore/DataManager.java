@@ -91,7 +91,7 @@ public class DataManager extends GameCoreManager {
             statement.close();
             return output;
         } catch (SQLException e) {
-            plugin.logError(e.getMessage());
+            GameCore.logger().error(e.getMessage());
         }
 
         return null;
@@ -113,7 +113,7 @@ public class DataManager extends GameCoreManager {
             statement.execute();
             statement.close();
         } catch (SQLException e) {
-            plugin.logError(e.getMessage());
+            GameCore.logger().error(e.getMessage());
         }
     }
 
@@ -129,7 +129,7 @@ public class DataManager extends GameCoreManager {
             statement.execute();
             statement.close();
         } catch (SQLException e) {
-            plugin.logError(e.getMessage());
+            GameCore.logger().error(e.getMessage());
         }
     }
 
@@ -147,7 +147,7 @@ public class DataManager extends GameCoreManager {
             statement.close();
             return output;
         } catch (SQLException e) {
-            plugin.logError(e.getMessage());
+            GameCore.logger().error(e.getMessage());
         }
 
         return null;
@@ -169,7 +169,7 @@ public class DataManager extends GameCoreManager {
             statement.execute();
             statement.close();
         } catch (SQLException e) {
-            plugin.logError(e.getMessage());
+            GameCore.logger().error(e.getMessage());
         }
     }
 
@@ -185,7 +185,7 @@ public class DataManager extends GameCoreManager {
             statement.execute();
             statement.close();
         } catch (SQLException e) {
-            plugin.logError(e.getMessage());
+            GameCore.logger().error(e.getMessage());
         }
     }
 
@@ -199,7 +199,7 @@ public class DataManager extends GameCoreManager {
             statement.execute(GAMEDATA_SCHEMA);
             statement.close();
         } catch (ClassNotFoundException | SQLException e) {
-            plugin.logError("Failed to connect to database\n" + e.getMessage());
+            GameCore.logger().error("Failed to connect to database\n{}", e.getMessage());
         }
     }
 

@@ -65,11 +65,8 @@ public final class GameCore extends JavaPlugin {
 
         FileConfiguration config = getConfig();
         tagPlayers = config.getBoolean("queues.tag-players");
-        debug = config.getBoolean("debug");
-        if (debug)
-            logDebug("DEBUG MODE IS ENABLED!");
 
-        logInfo("Loaded 'config.yml'");
+        logger.info("Loaded 'config.yml'");
         // --- *------------------------* ---
 
         // --- Update and Load Messages.yml ---
@@ -79,10 +76,10 @@ public final class GameCore extends JavaPlugin {
         try {
             ConfigUpdater.update(this, "messages.yml", messagesFile);
         } catch (IOException e) {
-            logError(e.getMessage());
+            logger.error(e.getMessage());
         }
         messages.reloadMessages();
-        logInfo("Loaded 'messages.yml'");
+        logger.info("Loaded 'messages.yml'");
         // --- *------------------------* ---
 
         // --- Load Game Managers ---
@@ -104,10 +101,10 @@ public final class GameCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(gameManager, this);
         getServer().getPluginManager().registerEvents(playerManager, this);
         getServer().getPluginManager().registerEvents(entityManager, this);
-        logInfo("Registered Event Handlers");
+        logger.info("Registered Event Handlers");
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            logInfo("PlaceholderAPI is enabled, registering Expansion.");
+            logger.info("PlaceholderAPI is enabled, registering Expansion.");
             new GameCoreExpansion(this).register();
         }
     }
@@ -183,17 +180,16 @@ public final class GameCore extends JavaPlugin {
         if (instance == null)
             return;
 
-        instance.logInfo("Reloading 'config.yml'");
+        instance.logger.info("Reloading 'config.yml'");
         instance.reloadConfig();
         FileConfiguration config = instance.getConfig();
         tagPlayers = config.getBoolean("tag-players");
-        instance.debug = config.getBoolean("debug");
 
-        instance.logInfo("Reloaded 'config.yml'");
+        instance.logger.info("Reloaded 'config.yml'");
 
-        instance.logInfo("Reloading 'messages.yml");
+        instance.logger.info("Reloading 'messages.yml");
         instance.messages.reloadMessages();
-        instance.logInfo("Reloaded 'messages.yml'");
+        instance.logger.info("Reloaded 'messages.yml'");
     }
 
     public static GameCore instance() {

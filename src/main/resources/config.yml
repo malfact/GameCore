@@ -1,5 +1,7 @@
 spawn-on-join: true
-debug: false
+compatability:
+  worldguard: true
+  placeholder-api: true
 lua:
   auto-load-scripts: true
 # Settings on how and when data should be cleaned.

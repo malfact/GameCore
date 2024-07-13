@@ -56,7 +56,7 @@ public class WorldLib extends InstancedLib {
 
     private Varargs setBlockData(Varargs args) {
         if (!instance.isRunning()) {
-            GameCore.logWarning(instance.getName() + " attempted to call setBlockData before running!");
+            GameCore.logger().warn("{} attempted to call setBlockData before running!", instance.getName());
             return LuaConstant.NIL;
         }
 
@@ -82,7 +82,7 @@ public class WorldLib extends InstancedLib {
 
     private Varargs setBlockType(Varargs args) {
         if (!instance.isRunning()) {
-            GameCore.logWarning(instance.getName() + " attempted to call setBlockType before running!");
+            GameCore.logger().warn("{} attempted to call setBlockType before running!", instance.getName());
             return LuaConstant.NIL;
         }
 

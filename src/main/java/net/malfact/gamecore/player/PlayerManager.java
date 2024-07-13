@@ -70,18 +70,18 @@ public final class PlayerManager extends GameCoreManager implements Listener {
     // Currently nothing will save since they get removed from teams & queues
     // Will probably add option to NOT remove offline players
     private void cleanPlayer(QueuedPlayer player) {
-        plugin.logInfo("Running Data-Clean on " + player);
+        GameCore.logger().info("Running Data-Clean on {}", player);
         if (player.inSystem()) {
             String queueName = player.getQueueName();
             String teamName = player.getTeamName();
 
             if (!queueName.isEmpty()) {
-                plugin.logInfo("Removing " + player + " from Queue <" + queueName + ">");
+                GameCore.logger().info("Removing {} from Queue <{}>", player, queueName);
                 GameCore.getQueueManager().getQueue(queueName).removePlayer(player);
             }
 
             if (!teamName.isEmpty()) {
-                plugin.logInfo("Removing " + player + " from Team <" + teamName + ">");
+                GameCore.logger().info("Removing {} from Team <{}>", player, teamName);
                 GameCore.getTeamManager().getTeam(teamName).removePlayer(player);
             }
         }
@@ -104,7 +104,7 @@ public final class PlayerManager extends GameCoreManager implements Listener {
 
     @Override
     public void clean() {
-        plugin.logInfo("Canceling " + cleaningTasks.size() + " Data-Clean Tasks");
+        GameCore.logger().info("Canceling " + cleaningTasks.size() + " Data-Clean Tasks");
         cleaningTasks.values().forEach(BukkitTask::cancel);
 
         players.values().forEach(this::cleanPlayer);
@@ -127,7 +127,7 @@ public final class PlayerManager extends GameCoreManager implements Listener {
                 () -> new QueuedPlayer(player)
             );
 
-            plugin.logInfo("Loaded Player Data for " + gamePlayer);
+            GameCore.logger().info("Loaded Player Data for {}", gamePlayer);
 
             players.put(uuid, gamePlayer);
         } else {
@@ -135,18 +135,18 @@ public final class PlayerManager extends GameCoreManager implements Listener {
             gamePlayer = players.get(uuid);
             gamePlayer.bindPlayer(player);
 
-            plugin.logInfo("Using active Player Data for " + gamePlayer);
+            GameCore.logger().info("Using active Player Data for {}", gamePlayer);
 
             // cancel the cleaning task
             cleaningTasks.get(uuid).cancel();
-            plugin.logInfo("Canceled Data-Clean for " + gamePlayer);
+            GameCore.logger().info("Canceled Data-Clean for {}", gamePlayer);
         }
 
         gamePlayer.setOnline(true);
 
         // Runs cached teleports
         if (gamePlayer.hasCachedTeleport()) {
-            plugin.logInfo("Player " + player + " has cached teleports. Changing Spawn Location");
+            GameCore.logger().info("Player {} has cached teleports. Changing Spawn Location", player);
             event.setSpawnLocation(gamePlayer.getCachedTeleport());
             gamePlayer.clearCachedTeleport();
         } else if (shouldPlayerSpawnOnJoin(gamePlayer)){
@@ -170,7 +170,7 @@ public final class PlayerManager extends GameCoreManager implements Listener {
 
         int cleanTimer = plugin.getConfig().getInt(cleanSetting, 60);
 
-        plugin.logInfo("Scheduling Data-Clean for " + gamePlayer + " in " + cleanTimer + " seconds");
+        GameCore.logger().info("Scheduling Data-Clean for {} in {} seconds", gamePlayer, cleanTimer);
 
         BukkitTask task = plugin.getServer().getScheduler().runTaskLater(
             plugin,

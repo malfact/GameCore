@@ -59,7 +59,7 @@ public class ScriptedGame extends Game {
     @Override
     protected void onStart() {
         if (!script.run()){
-            GameCore.instance().logError("Problem in " + getName() + ": Stopping.");
+            GameCore.logger().error("Problem in " + getName() + ": Stopping.");
             stop();
         }
     }

@@ -122,7 +122,7 @@ public class TeamManager extends GameCoreManager {
         }
 
         Json.write(plugin, "data/teams", data);
-        plugin.logInfo("Saved Teams to teams.json");
+        GameCore.logger().info("Saved Teams to teams.json");
     }
 
     /**
@@ -146,7 +146,7 @@ public class TeamManager extends GameCoreManager {
             TEAMS.put(teamData.name, gameTeam);
         }
 
-        plugin.logInfo("Loaded Teams from 'teams.json'");
+        GameCore.logger().info("Loaded Teams from 'teams.json'");
     }
 
     void setPlayerTeam(UUID uuid, String team) {

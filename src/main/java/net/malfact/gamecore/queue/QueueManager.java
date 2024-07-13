@@ -102,7 +102,7 @@ public class QueueManager extends GameCoreManager {
         }
 
         Json.write(plugin, "data/queues", data);
-        plugin.logInfo("Saved Queues to queues.json");
+        GameCore.logger().info("Saved Queues to queues.json");
     }
 
     /**
@@ -123,6 +123,6 @@ public class QueueManager extends GameCoreManager {
                 QUEUES.put(queueData.name, queue);
             }
         }
-        plugin.logInfo("Loaded Queues from 'queues.json'");
+        GameCore.logger().info("Loaded Queues from 'queues.json'");
     }
 }

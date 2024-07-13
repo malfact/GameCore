@@ -100,7 +100,6 @@ public abstract class Game {
             return false;
 
         entities.add(entity);
-        GameCore.logDebug("Registered entity " + entity.getName() + " with game: " + getName());
 
         return true;
     }
@@ -154,8 +153,6 @@ public abstract class Game {
 
         state = State.STARTING;
 
-        GameCore.logDebug("Starting Game: " + getName());
-
         timer = 0;
 
         if (gameTask != null && !gameTask.isCancelled())
@@ -189,7 +186,6 @@ public abstract class Game {
      */
     public final void stop() {
         if (state == State.STARTING || state == State.RUNNING) {
-            GameCore.logDebug("Stop Called for " + getName());
             stop = true;
         }
     }
@@ -197,8 +193,6 @@ public abstract class Game {
 
     void forceStop() {
         state = State.STOPPING;
-
-        GameCore.logDebug("Stopping Game: " + getName());
 
         this.onStop();
         Bukkit.getPluginManager().callEvent(new GameStopEvent(this));
@@ -233,8 +227,6 @@ public abstract class Game {
      */
     public final void reload() {
         boolean wasRunning = state == State.RUNNING;
-
-        GameCore.logDebug("Reloading Game: " + getName());
 
         if (wasRunning)
             this.forceStop();
@@ -338,7 +330,6 @@ public abstract class Game {
                 return;
 
             if (game.stop) {
-                GameCore.logDebug(game.getName() + "::GameTask # Stopping Game");
                 this.cancel();
                 game.forceStop();
                 return;

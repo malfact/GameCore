@@ -32,7 +32,6 @@ public class GameManager extends GameCoreManager implements Listener {
         if (games.containsKey(game.getName()))
             throw new IllegalArgumentException("Game " + game.getName() + " already registered");
 
-        GameCore.logDebug("Registered Game: " + game.getName());
         games.put(game.getName(), game);
     }
 
