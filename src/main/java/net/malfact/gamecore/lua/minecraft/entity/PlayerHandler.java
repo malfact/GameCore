@@ -193,6 +193,17 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
         return getUserdataOf(player);
     }
 
+    public static Player checkPlayer(LuaValue arg) {
+        PlayerProxy proxy = arg.touserdata(PlayerProxy.class);
+        if (proxy == null)
+            throw new LuaError("bad argument, (Player expected, got " + arg.getType() + ")");
+
+        if (!proxy.isValid())
+            throw new LuaError("bad argument, (Player \"" + proxy.getName() + "\" is not valid)");
+
+        return proxy.getPlayer();
+    }
+
     public class GamePlayerHandler implements TypeHandler<PlayerProxy> {
 
         private final LuaFunction func_index =      LuaUtil.toFunction(this::onIndex);
@@ -259,15 +270,15 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
 
     private void sendMessageRaw(Varargs args) {
         Varargs args1 = args.subargs(2);
-        args.arg1().checkuserdata(Player.class).sendRawMessage(LuaUtil.toString(args1));
+        checkPlayer(args.arg1()).sendRawMessage(LuaUtil.toString(args1));
     }
 
     private void sendMessage(Varargs args) {
-        args.arg1().checkuserdata(Player.class).sendMessage(LuaUtil.toComponent(LuaUtil.toString(args.subargs(2))));
+        checkPlayer(args.arg1()).sendMessage(LuaUtil.toComponent(LuaUtil.toString(args.subargs(2))));
     }
 
     private void playSound(Varargs args) {
-        Player player = args.arg(1).checkuserdata(Player.class);
+        Player player = checkPlayer(args.arg(1));
         World world = player.getWorld();
 
         int o = 0;
@@ -296,7 +307,7 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
     }
 
     private void stopSound(LuaValue arg1, LuaValue arg2) {
-        Player player = arg1.checkuserdata(Player.class);
+        Player player = checkPlayer(arg1);
         if (arg2.isnil())
             player.stopAllSounds();
         else
@@ -304,56 +315,56 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
     }
 
     private void sendActionBar(Varargs args) {
-        Player player = args.arg(1).checkuserdata(Player.class);
+        Player player = checkPlayer(args.arg1());
         String msg = LuaUtil.toString(args.subargs(2));
         player.sendActionBar(LuaUtil.toComponent(msg));
     }
 
     private void setTime(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
-        Player player = arg1.checkuserdata(Player.class);
+        Player player = checkPlayer(arg1);
         long time = arg2.checklong();
         boolean relative = arg3.optboolean(false);
         player.setPlayerTime(time, relative);
     }
 
     private LuaValue getTime(LuaValue arg) {
-        return LuaValue.valueOf(arg.checkuserdata(Player.class).getPlayerTime());
+        return LuaValue.valueOf(checkPlayer(arg).getPlayerTime());
     }
 
     private LuaValue getTimeOffset(LuaValue arg) {
-        return LuaValue.valueOf(arg.checkuserdata(Player.class).getPlayerTimeOffset());
+        return LuaValue.valueOf(checkPlayer(arg).getPlayerTimeOffset());
     }
 
     private void resetTime(LuaValue arg) {
-        arg.checkuserdata(Player.class).resetPlayerTime();
+        checkPlayer(arg).resetPlayerTime();
     }
 
     private void setWeather(LuaValue arg1, LuaValue arg2) {
-        arg1.checkuserdata(Player.class).setPlayerWeather(LuaUtil.checkEnum(arg2, WeatherType.class));
+        checkPlayer(arg1).setPlayerWeather(LuaUtil.checkEnum(arg2, WeatherType.class));
     }
 
     private LuaValue getWeather(LuaValue arg) {
-        return LuaUtil.valueOf(arg.checkuserdata(Player.class).getPlayerWeather());
+        return LuaUtil.valueOf(checkPlayer(arg).getPlayerWeather());
     }
 
     private void resetWeather(LuaValue arg) {
-        arg.checkuserdata(Player.class).resetPlayerWeather();
+        checkPlayer(arg).resetPlayerWeather();
     }
 
     private void giveExp(LuaValue arg1, LuaValue arg2) {
-        arg1.checkuserdata(Player.class).giveExp(Math.max(1, arg2.optint(1)));
+        checkPlayer(arg1).giveExp(Math.max(1, arg2.optint(1)));
     }
 
     private void giveExpLevels(LuaValue arg1, LuaValue arg2) {
-        arg1.checkuserdata(Player.class).giveExpLevels(Math.max(1, arg2.optint(1)));
+        checkPlayer(arg1).giveExpLevels(Math.max(1, arg2.optint(1)));
     }
 
     private LuaValue canSee(LuaValue arg1, LuaValue arg2) {
-        return LuaValue.valueOf(arg1.checkuserdata(Player.class).canSee(arg2.checkuserdata(Entity.class)));
+        return LuaValue.valueOf(checkPlayer(arg1).canSee(arg2.checkuserdata(Entity.class)));
     }
 
     private void showTitle(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
-        Player player = arg1.checkuserdata(Player.class);
+        Player player = checkPlayer(arg1);
         Component title = LuaUtil.toComponent(arg2);
         Component subtitle = LuaUtil.toComponent(arg3.optjstring(""));
 
@@ -361,11 +372,11 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
     }
 
     private void resetTitle(LuaValue arg) {
-        arg.checkuserdata(Player.class).resetTitle();
+        checkPlayer(arg).resetTitle();
     }
 
     private void spawnParticle(Varargs args) {
-        Player player = args.arg1().checkuserdata(Player.class);
+        Player player = checkPlayer(args.arg1());
         Particle particle = LuaUtil.toParticle(args.arg(2).checkjstring());
         int i = 3;
         double x, y, z;
@@ -391,22 +402,22 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
     }
 
     private LuaValue getCooledAttackStrength(LuaValue arg1, LuaValue arg2) {
-        Player player = arg1.checkuserdata(Player.class);
+        Player player = checkPlayer(arg1);
         float adjustTicks = (float) arg2.optdouble(0);
         return LuaValue.valueOf(player.getCooledAttackStrength(adjustTicks));
     }
 
     private void resetCooldown(LuaValue arg) {
-        arg.checkuserdata(Player.class).resetCooldown();
+        checkPlayer(arg).resetCooldown();
     }
 
     private void setRotation(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
-        arg1.checkuserdata(Player.class).setRotation((float) arg2.checkdouble(), (float) arg3.checkdouble());
+        checkPlayer(arg1).setRotation((float) arg2.checkdouble(), (float) arg3.checkdouble());
     }
 
     @SuppressWarnings("UnstableApiUsage")
     private void lookAt(Varargs args) {
-        Player player = args.arg1().checkuserdata(Player.class);
+        Player player = checkPlayer(args.arg1());
         switch (args.narg()) {
             case 1:
             case 2:
@@ -433,10 +444,10 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
     }
 
     private void showElderGuardian(LuaValue arg1, LuaValue arg2) {
-        arg1.checkuserdata(Player.class).showElderGuardian(arg2.optboolean(false));
+        checkPlayer(arg1).showElderGuardian(arg2.optboolean(false));
     }
 
     private void resetIdleDuration(LuaValue arg1) {
-        arg1.checkuserdata(Player.class).resetIdleDuration();
+        checkPlayer(arg1).resetIdleDuration();
     }
 }

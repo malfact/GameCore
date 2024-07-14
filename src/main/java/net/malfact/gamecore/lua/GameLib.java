@@ -6,6 +6,7 @@ import net.malfact.gamecore.api.LuaUtil;
 import net.malfact.gamecore.game.Game;
 import net.malfact.gamecore.game.player.PlayerProxy;
 import net.malfact.gamecore.lua.event.EventLib;
+import net.malfact.gamecore.lua.minecraft.entity.PlayerHandler;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.luaj.vm2.LuaConstant;
@@ -17,7 +18,6 @@ public class GameLib extends EventLib {
 
     private final LuaFunction func_getPlayers =     LuaUtil.toFunction(this::getPlayers);
     private final LuaFunction func_getEntities =    LuaUtil.toFunction(this::getEntities);
-    private final LuaFunction func_joinGame =       LuaUtil.toFunction(this::joinGame);
     private final LuaFunction func_leaveGame =      LuaUtil.toFunction(this::leaveGame);
     private final LuaFunction func_isPlaying =      LuaUtil.toFunction(this::isPlaying);
     private final LuaFunction func_stop =           LuaUtil.toFunction(this::stopGame);
@@ -32,7 +32,6 @@ public class GameLib extends EventLib {
 
         lib.set("getPlayers",   func_getPlayers);
         lib.set("getEntities",  func_getEntities);
-        lib.set("joinGame",     func_joinGame);
         lib.set("leaveGame",    func_leaveGame);
         lib.set("isPlaying",    func_isPlaying);
         lib.set("stop",         func_stop);
@@ -90,20 +89,8 @@ public class GameLib extends EventLib {
         return table;
     }
 
-    private LuaValue joinGame(LuaValue args) {
-        Player player = args.arg1().checkuserdata(Player.class);
-        Game game = GameCore.gameManager().getGame(player);
-
-        if (game != null)
-            return LuaConstant.FALSE;
-
-        var joined = GameCore.gameManager().joinGame(player, instance);
-
-        return joined ? LuaApi.userdataOf(player, instance) : LuaConstant.FALSE;
-    }
-
     private LuaValue leaveGame(LuaValue arg) {
-        Player player = arg.checkuserdata(Player.class);
+        Player player = PlayerHandler.checkPlayer(arg);
         Game game = GameCore.gameManager().getGame(player);
         if (game == null)
             return LuaConstant.FALSE;

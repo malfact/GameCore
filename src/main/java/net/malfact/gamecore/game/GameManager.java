@@ -50,6 +50,9 @@ public class GameManager extends GameCoreManager implements Listener {
     }
 
     public Game getGame(String game) {
+        if (game == null)
+            return null;
+
         return games.get(game);
     }
 
@@ -130,14 +133,22 @@ public class GameManager extends GameCoreManager implements Listener {
     }
 
     public boolean isPlayerInGame(Player player) {
-        return players.containsKey(player.getUniqueId());
+        return isPlayerInGame(player.getUniqueId());
+    }
+
+    public boolean isPlayerInGame(UUID uuid) {
+        return players.containsKey(uuid);
     }
 
     public boolean isPlayerInGame(Player player, Game game) {
-        if (!players.containsKey(player.getUniqueId()))
+        return isPlayerInGame(player.getUniqueId(), game);
+    }
+
+    public boolean isPlayerInGame(UUID uuid, Game game) {
+        if (!players.containsKey(uuid))
             return false;
 
-        return game.equals(players.get(player.getUniqueId()).getGame());
+        return game.equals(players.get(uuid).getGame());
     }
 
     void onGameStopped(Game game) {

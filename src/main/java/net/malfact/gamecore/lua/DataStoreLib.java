@@ -5,6 +5,7 @@ import net.malfact.gamecore.api.InstancedLib;
 import net.malfact.gamecore.api.LuaApi;
 import net.malfact.gamecore.api.LuaUtil;
 import net.malfact.gamecore.game.Game;
+import net.malfact.gamecore.lua.minecraft.entity.PlayerHandler;
 import org.bukkit.entity.Player;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
@@ -38,21 +39,21 @@ public class DataStoreLib extends InstancedLib {
     }
 
     private LuaValue getPlayerData(LuaValue arg1, LuaValue arg2) {
-        Player player = arg1.checkuserdata(Player.class);
+        Player player = PlayerHandler.checkPlayer(arg1);
         String key = arg2.checkjstring();
         var data = GameCore.getDataManager().getPlayerData(player, key);
         return LuaApi.valueOf(data);
     }
 
     private void setPlayerData(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
-        Player player = arg1.checkuserdata(Player.class);
+        Player player = PlayerHandler.checkPlayer(arg1);
         String key = arg2.checkjstring();
         Object data = unwrap(arg3);
         GameCore.getDataManager().setPlayerData(player, key, data);
     }
 
     private void clearPlayerData(LuaValue arg1, LuaValue arg2) {
-        Player player = arg1.checkuserdata(Player.class);
+        Player player = PlayerHandler.checkPlayer(arg1);
         String key = arg2.checkjstring();
         GameCore.getDataManager().clearPlayerData(player, key);
     }

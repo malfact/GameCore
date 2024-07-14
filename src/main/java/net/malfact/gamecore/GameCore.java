@@ -1,11 +1,12 @@
 package net.malfact.gamecore;
 
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.malfact.gamecore.api.LuaApi;
 import net.malfact.gamecore.api.ScriptApi;
 import net.malfact.gamecore.command.GameCoreCommands;
 import net.malfact.gamecore.compat.placeholderapi.GameCoreExpansion;
+import net.malfact.gamecore.compat.worldguard.GameRegionHandler;
+import net.malfact.gamecore.compat.worldguard.WorldGuardFlags;
 import net.malfact.gamecore.config.ConfigUpdater;
 import net.malfact.gamecore.game.GameManager;
 import net.malfact.gamecore.game.ScriptedGame;
@@ -27,7 +28,6 @@ public final class GameCore extends JavaPlugin {
 
     public static final String queuePrefix = "gamecore.queue.";
     public static boolean tagPlayers = true;
-    private boolean debug = false;
 
     private static GameCore instance;
 
@@ -45,11 +45,6 @@ public final class GameCore extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        GameCoreCommands.register(this);
-    }
-
-    @Override
-    public void onEnable() {
         instance = this;
         this.logger = getComponentLogger();
 
@@ -59,7 +54,7 @@ public final class GameCore extends JavaPlugin {
         try {
             ConfigUpdater.update(this, "config.yml", configFile);
         } catch (IOException e) {
-            logError(e.getMessage());
+            logger.error(e.getMessage());
         }
         reloadConfig();
 
@@ -67,6 +62,7 @@ public final class GameCore extends JavaPlugin {
         tagPlayers = config.getBoolean("queues.tag-players");
 
         logger.info("Loaded 'config.yml'");
+
         // --- *------------------------* ---
 
         // --- Update and Load Messages.yml ---
@@ -81,6 +77,17 @@ public final class GameCore extends JavaPlugin {
         messages.reloadMessages();
         logger.info("Loaded 'messages.yml'");
         // --- *------------------------* ---
+
+        GameCoreCommands.register(this);
+
+        if (config.getBoolean("compatability.worldguard") && Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
+            logger.info("WorldGuard is enabled, registering compatability.");
+            WorldGuardFlags.registerFlags();
+        }
+    }
+
+    @Override
+    public void onEnable() {
 
         // --- Load Game Managers ---
         queueManager = new QueueManager(this);
@@ -106,6 +113,11 @@ public final class GameCore extends JavaPlugin {
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             logger.info("PlaceholderAPI is enabled, registering Expansion.");
             new GameCoreExpansion(this).register();
+        }
+
+        if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
+            var mng = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getSessionManager();
+            mng.registerHandler(GameRegionHandler.FACTORY, com.sk89q.worldguard.session.handler.ExitFlag.FACTORY);
         }
     }
 
@@ -157,23 +169,6 @@ public final class GameCore extends JavaPlugin {
                 luaApi.loadScript(script, game);
             }
         }
-    }
-
-    public static void logDebug(String message) {
-        if (instance.debug)
-            instance.logger.info("[DEBUG] {}", message);
-    }
-
-    public void logInfo(String message) {
-        logger.info(Component.text(message));
-    }
-
-    public static void logWarning(String message) {
-        instance.logger.warn(message);
-    }
-
-    public void logError(String message) {
-        logger.error(Component.text(message));
     }
 
     public static void ReloadConfig() {
