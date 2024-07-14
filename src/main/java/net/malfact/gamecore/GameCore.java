@@ -110,12 +110,12 @@ public final class GameCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(entityManager, this);
         logger.info("Registered Event Handlers");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+        if (getConfig().getBoolean("compatability.placeholder-api") && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             logger.info("PlaceholderAPI is enabled, registering Expansion.");
             new GameCoreExpansion(this).register();
         }
 
-        if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
+        if (getConfig().getBoolean("compatability.worldguard") && Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
             var mng = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getSessionManager();
             mng.registerHandler(GameRegionHandler.FACTORY, com.sk89q.worldguard.session.handler.ExitFlag.FACTORY);
         }
