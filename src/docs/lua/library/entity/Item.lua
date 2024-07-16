@@ -1,0 +1,12 @@
+---@meta
+
+---@class Item : Entity
+---@field itemStack ItemStack
+---@field pickupDelay integer
+---@field unlimitedLifetime boolean
+---@field owner string
+---@field thrower string
+---@field canMobPickup boolean
+---@field canPlayerPickup boolean
+---@field willAge boolean
+---@field health integer

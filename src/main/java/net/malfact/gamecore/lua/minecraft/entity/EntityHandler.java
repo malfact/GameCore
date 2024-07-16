@@ -267,7 +267,6 @@ public class EntityHandler<T extends Entity> implements TypeHandler<T> {
             if (!instance.hasEntity(entity))
                 return LuaConstant.NIL;
 
-
             instance.unregisterEntity(entity);
             entity.remove();
 

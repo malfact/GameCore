@@ -72,9 +72,10 @@ public class ScriptedGame extends Game {
     @Override
     public void onClean() {
         if (callbacks != null && !callbacks.isEmpty()) {
-            for (var callback : callbacks) {
-                EventRegistry.unregisterListener(callback);
-            }
+//            for (var callback : callbacks) {
+//                EventRegistry.unregisterListener(this, callback);
+//            }
+            EventRegistry.unregisterListeners(this);
             callbacks.clear();
         }
 
@@ -119,7 +120,10 @@ public class ScriptedGame extends Game {
             try {
                 function.call(LuaApi.userdataOf(event, instance));
             } catch (LuaError error) {
-                GameCore.logger().error("Error in {}:\n\t{}", script, error.getMessage());
+                GameCore.logger().error("Lua Error in {}:\n\t{}", script, error.getMessage());
+            } catch (Exception e) {
+                GameCore.logger().error("Exception in {}:\n\t{}\n====Stopping {}", script, e.getMessage(), instance.getName());
+                instance.stop();
             }
         }
     }

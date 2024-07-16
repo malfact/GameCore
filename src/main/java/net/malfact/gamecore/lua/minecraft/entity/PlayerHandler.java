@@ -26,7 +26,7 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
     private final LuaFunction func_sendActionBar =              LuaUtil.toVarargFunction(this::sendActionBar);
     private final LuaFunction func_setTime =                    LuaUtil.toFunction(this::setTime);
     private final LuaFunction func_getTime =                    LuaUtil.toFunction(this::getTime);
-    private final LuaFunction func_setTimeOffset =              LuaUtil.toFunction(this::getTimeOffset);
+    private final LuaFunction func_getTimeOffset =              LuaUtil.toFunction(this::getTimeOffset);
     private final LuaFunction func_resetTime =                  LuaUtil.toFunction(this::resetTime);
     private final LuaFunction func_setWeather =                 LuaUtil.toFunction(this::setWeather);
     private final LuaFunction func_getWeather =                 LuaUtil.toFunction(this::getWeather);
@@ -101,7 +101,7 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
             case "sendActionBar" ->           func_sendActionBar;
             case "setTime" ->                 func_setTime;
             case "getTime" ->                 func_getTime;
-            case "setTimeOffset" ->           func_setTimeOffset;
+            case "getTimeOffset" ->           func_getTimeOffset;
             case "resetTime" ->               func_resetTime;
             case "setWeather" ->              func_setWeather;
             case "getWeather" ->              func_getWeather;
@@ -181,7 +181,7 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
 
     @Override
     public LuaValue getUserdataOf(Player player) {
-        PlayerProxy proxy = GameCore.gameManager().getPlayer(player.getUniqueId());
+        PlayerProxy proxy = GameCore.gameManager().getPlayerProxy(player.getUniqueId());
         if (!proxy.isValid())
             return super.getUserdataOf(player); // ToDo UninstancedPlayer
 
@@ -344,7 +344,7 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
     }
 
     private LuaValue getWeather(LuaValue arg) {
-        return LuaUtil.valueOf(checkPlayer(arg).getPlayerWeather());
+        return LuaApi.valueOf(checkPlayer(arg).getPlayerWeather());
     }
 
     private void resetWeather(LuaValue arg) {
@@ -352,11 +352,11 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
     }
 
     private void giveExp(LuaValue arg1, LuaValue arg2) {
-        checkPlayer(arg1).giveExp(Math.max(1, arg2.optint(1)));
+        checkPlayer(arg1).giveExp(arg2.optint(1));
     }
 
     private void giveExpLevels(LuaValue arg1, LuaValue arg2) {
-        checkPlayer(arg1).giveExpLevels(Math.max(1, arg2.optint(1)));
+        checkPlayer(arg1).giveExpLevels(arg2.optint(1));
     }
 
     private LuaValue canSee(LuaValue arg1, LuaValue arg2) {
@@ -381,10 +381,10 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
         int i = 3;
         double x, y, z;
         if (args.arg(3).isuserdata()) {
-            Location location = args.arg(3).checkuserdata(Location.class);
-            x = location.x();
-            y = location.y();
-            z = location.z();
+            Vector3 location = LuaUtil.checkVector3(args.arg(3));
+            x = location.x;
+            y = location.y;
+            z = location.z;
             i++;
         } else {
             x = args.arg(i++).checkdouble();
@@ -428,8 +428,8 @@ public class PlayerHandler extends HumanEntityHandler<Player> {
                 break;
             case 4:
                 Entity e = args.arg(2).checkuserdata(Entity.class);
-                LookAnchor playerAnchor = LuaUtil.checkEnum(args.arg(2), LookAnchor.class);
-                LookAnchor entityAnchor = LuaUtil.checkEnum(args.arg(3), LookAnchor.class);
+                LookAnchor playerAnchor = LuaUtil.checkEnum(args.arg(3), LookAnchor.class);
+                LookAnchor entityAnchor = LuaUtil.checkEnum(args.arg(4), LookAnchor.class);
                 player.lookAt(e, playerAnchor, entityAnchor);
                 break;
             default:

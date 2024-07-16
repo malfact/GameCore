@@ -70,6 +70,9 @@ public class GameRegionHandler extends Handler {
             // onEnter (potentially) forces the player to join the game
             // entry check (could) require the player be in the game
             allowed = currentRegion.checkEntry(player);
+
+            if (allowed)
+                currentRegion.onTrigger(player);
         }
 
         if (allowed)

@@ -22,17 +22,24 @@ public class GameRegion {
     public final boolean joinOnEnter;
     public final boolean leaveOnExit;
     public final boolean allowGameOnly;
+    public final String trigger;
 
     private GameRegion(Game game, LocalPlayer player, ApplicableRegionSet set) {
         this.game = game;
         this.joinOnEnter = getBoolValue(set, player, WorldGuardFlags.JOIN_GAME);
         this.leaveOnExit = getBoolValue(set, player, WorldGuardFlags.LEAVE_GAME);
         this.allowGameOnly = getBoolValue(set, player, WorldGuardFlags.ALLOW_GAME_ONLY);
+        this.trigger = set.queryValue(player, WorldGuardFlags.GAME_TRIGGER);
     }
 
     public void onEnter(LocalPlayer player) {
         if (joinOnEnter && !isPlayerInGame(player))
             GameCore.gameManager().joinGame(Bukkit.getPlayer(player.getUniqueId()), this.game);
+    }
+
+    public void onTrigger(LocalPlayer player) {
+        if (trigger != null && isPlayerInGame(player))
+            game.sendTrigger(GameCore.gameManager().getPlayerProxy(player.getUniqueId()), trigger);
     }
 
     public boolean checkEntry(LocalPlayer player) {

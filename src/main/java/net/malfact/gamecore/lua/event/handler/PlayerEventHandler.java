@@ -33,7 +33,7 @@ public class PlayerEventHandler implements TypeHandler<PlayerEvent> {
             return LuaConstant.NIL;
 
         PlayerEvent event = self.checkuserdata(PlayerEvent.class);
-        PlayerProxy player = GameCore.gameManager().getPlayer(event.getPlayer().getUniqueId());
+        PlayerProxy player = GameCore.gameManager().getPlayerProxy(event.getPlayer().getUniqueId());
 
         String stringKey = key.tojstring();
         if (stringKey.equals("player"))

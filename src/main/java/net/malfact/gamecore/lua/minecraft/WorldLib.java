@@ -33,10 +33,10 @@ public class WorldLib extends InstancedLib {
     public void load(LuaValue env) {
         LuaTable lib = new LuaTable();
 
-        lib.set("setBlockData", func_getBlockData);
-        lib.set("setBlockType", func_setBlockData);
+        lib.set("getBlockData", func_getBlockData);
+        lib.set("setBlockData", func_setBlockData);
         lib.set("getBlockType", func_getBlockType);
-        lib.set("getBlockType", func_setBlockType);
+        lib.set("setBlockType", func_setBlockType);
         lib.set("playSound",    func_playSound);
         lib.set("strikeLightning", func_strikeLightning);
         lib.set("strikeLightningEffect", func_strikeLightningEffect);
@@ -54,6 +54,7 @@ public class WorldLib extends InstancedLib {
         return null;
     }
 
+    // setBlockData(location, data)
     private Varargs setBlockData(Varargs args) {
         if (!instance.isRunning()) {
             GameCore.logger().warn("{} attempted to call setBlockData before running!", instance.getName());
@@ -77,7 +78,7 @@ public class WorldLib extends InstancedLib {
         instance.registerBlockChange(location);
         world.setBlockData(location, blockData);
 
-        return LuaConstant.NIL;
+        return LuaConstant.TRUE;
     }
 
     private Varargs setBlockType(Varargs args) {
@@ -95,7 +96,7 @@ public class WorldLib extends InstancedLib {
         instance.registerBlockChange(location);
         world.setType(location, LuaUtil.checkMaterial(args.arg(2)));
 
-        return LuaConstant.NIL;
+        return LuaConstant.TRUE;
     }
 
     private Varargs getBlockData(Varargs args) {
@@ -116,7 +117,7 @@ public class WorldLib extends InstancedLib {
         if (location == null)
             return LuaConstant.NIL; // instance.warn("Location expected, got " +  args.arg1().getType() + ")");
         World world = location.getWorld();
-        return LuaApi.valueOf(world.getType(location));
+        return LuaApi.userdataOf(world.getType(location));
     }
 
     private void playSound(Varargs args) {

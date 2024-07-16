@@ -7,6 +7,7 @@ import net.malfact.gamecore.event.GameEvent;
 import net.malfact.gamecore.event.player.PlayerConnectEvent;
 import net.malfact.gamecore.event.player.PlayerDisconnectEvent;
 import net.malfact.gamecore.event.player.PlayerGameEvent;
+import net.malfact.gamecore.event.player.PlayerTriggerEvent;
 import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.luaj.vm2.*;
@@ -48,6 +49,9 @@ public final class GameEventHandler implements TypeHandler<GameEvent> {
             case "quitReason":
                 if (event instanceof PlayerDisconnectEvent e)
                     return LuaApi.userdataOf(e.getQuitReason());
+            case "trigger":
+                if (event instanceof PlayerTriggerEvent e)
+                    return LuaApi.valueOf(e.getTrigger());
         }
 
         return LuaConstant.NIL;

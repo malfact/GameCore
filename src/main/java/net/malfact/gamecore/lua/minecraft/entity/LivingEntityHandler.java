@@ -38,17 +38,17 @@ public class LivingEntityHandler<T extends LivingEntity> extends EntityHandler<T
             case "health" ->                LuaApi.valueOf(entity.getHealth());
 
             // Get Only
-            case "eyeHeight" ->             LuaApi.userdataOf(entity.getEyeHeight());
-            case "rawEyeHeight" ->          LuaApi.userdataOf(entity.getEyeHeight(true));
+            case "eyeHeight" ->             LuaApi.valueOf(entity.getEyeHeight());
+            case "rawEyeHeight" ->          LuaApi.valueOf(entity.getEyeHeight(true));
             case "eyeLocation" ->           LuaApi.userdataOf(entity.getEyeLocation());
             case "leashed" ->               LuaApi.valueOf(entity.isLeashed());
             case "swimming" ->              LuaApi.valueOf(entity.isSwimming());
             case "sleeping" ->              LuaApi.valueOf(entity.isSleeping());
             case "climbing" ->              LuaApi.valueOf(entity.isClimbing());
-            case "upwardsMovement" ->       LuaApi.userdataOf(entity.getUpwardsMovement());
-            case "sidewaysMovement" ->      LuaApi.userdataOf(entity.getSidewaysMovement());
-            case "forwardsMovement" ->      LuaApi.userdataOf(entity.getForwardsMovement());
-            case "canBreathUnderwater" ->   LuaApi.userdataOf(entity.canBreatheUnderwater());
+            case "upwardsMovement" ->       LuaApi.valueOf(entity.getUpwardsMovement());
+            case "sidewaysMovement" ->      LuaApi.valueOf(entity.getSidewaysMovement());
+            case "forwardsMovement" ->      LuaApi.valueOf(entity.getForwardsMovement());
+            case "canBreathUnderwater" ->   LuaApi.valueOf(entity.canBreatheUnderwater());
 
             // Functions
             case "addPotionEffect" -> addPotionEffect;

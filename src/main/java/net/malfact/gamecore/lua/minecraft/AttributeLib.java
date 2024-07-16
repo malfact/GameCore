@@ -1,6 +1,5 @@
 package net.malfact.gamecore.lua.minecraft;
 
-import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.api.LuaApi;
 import net.malfact.gamecore.api.LuaLib;
 import net.malfact.gamecore.api.LuaUtil;
@@ -59,8 +58,7 @@ public class AttributeLib implements LuaLib, TypeHandler<AttributeInstance> {
         if (key == null)
             return LuaConstant.NIL;
 
-
-        return GameCore.luaApi().getUserdataOf(self.checkuserdata(AttributeInstance.class).getModifier(key));
+        return LuaApi.userdataOf(self.checkuserdata(AttributeInstance.class).getModifier(key));
     }
 
     private void addModifier(LuaValue self, LuaValue arg) {

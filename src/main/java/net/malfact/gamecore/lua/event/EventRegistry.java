@@ -12,6 +12,7 @@ import net.malfact.gamecore.event.GameStartEvent;
 import net.malfact.gamecore.event.GameStopEvent;
 import net.malfact.gamecore.event.GameTickEvent;
 import net.malfact.gamecore.event.player.*;
+import net.malfact.gamecore.game.Game;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
@@ -39,6 +40,7 @@ public class EventRegistry {
         registerEvent("game", "onPlayerConnect",    PlayerConnectEvent.class);    // PlayerSpawnLocationEvent
         registerEvent("game", "onPlayerDisconnect", PlayerDisconnectEvent.class); // PlayerQuitEvent
         registerEvent("game", "onPlayerSpawn",      PlayerSpawnEvent.class);      // PlayerJoinEvent
+        registerEvent("game", "onPlayerTrigger",    PlayerTriggerEvent.class);
     }
 
     // Player Events
@@ -309,51 +311,49 @@ public class EventRegistry {
         return entries.get(name);
     }
 
-    public static void unregisterListener(EventListener listener) {
+    public static void unregisterListeners(Game game) {
         for (var type : REGISTRY.values()) {
             for (var event : type.values()) {
-                event.unregisterListener(listener);
+                event.unregisterListeners(game);
             }
         }
+        GameCore.logger().info("Unregistered Listeners for {}", game.getName());
     }
 
     public static class EventEntry {
 
         public final String name;
         public final Class<? extends Event> eventClass;
-        private final List<EventListener> listeners;
+        private final Map<UUID, List<EventListener>> listeners;
 
         private EventEntry(String name, Class<? extends Event> eventClass) {
             this.name = name;
             this.eventClass = eventClass;
-
-            listeners = new ArrayList<>();
+            listeners = new HashMap<>();
         }
 
-        public void registerListener(EventListener listener) {
-            if (listeners.contains(listener))
-                return;
-
+        public void registerListener(Game game, EventListener listener) {
+            List<EventListener> listeners = this.listeners.computeIfAbsent(game.getUniqueId(), k -> new ArrayList<>());
             listeners.add(listener);
             Bukkit.getPluginManager().registerEvent(eventClass, listener, EventPriority.NORMAL, listener, GameCore.instance());
-            GameCore.logger().debug("Registered Listener for {}", eventClass.getSimpleName());
+            GameCore.logger().info("Registered Listener for {}:{}", game.getName(), eventClass.getSimpleName());
         }
 
-        public void unregisterListener(EventListener listener) {
-            if (!listeners.contains(listener))
-                return;
+        public void unregisterListeners(Game game) {
+            var listeners = this.listeners.get(game.getUniqueId());
 
-            listeners.remove(listener);
+            if (listeners == null || listeners.isEmpty())
+                return;
 
             try {
                 var method = eventClass.getMethod("getHandlerList");
                 var handlerList = (HandlerList) method.invoke(null);
-                handlerList.unregister(listener);
+                for (var listener : listeners) {
+                    handlerList.unregister(listener);
+                }
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
+                GameCore.logger().error(e.getMessage());
             }
-
-            GameCore.logger().debug("Unregistered Listener for {}", eventClass.getSimpleName());
         }
     }
 }

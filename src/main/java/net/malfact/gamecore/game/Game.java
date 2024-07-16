@@ -1,24 +1,16 @@
 package net.malfact.gamecore.game;
 
-import io.papermc.paper.event.player.PlayerNameEntityEvent;
-import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import net.malfact.gamecore.GameCore;
 import net.malfact.gamecore.event.GameStartEvent;
 import net.malfact.gamecore.event.GameStopEvent;
 import net.malfact.gamecore.event.GameTickEvent;
+import net.malfact.gamecore.event.player.PlayerTriggerEvent;
+import net.malfact.gamecore.game.player.PlayerProxy;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityEvent;
-import org.bukkit.event.entity.PlayerLeashEntityEvent;
-import org.bukkit.event.player.PlayerEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerShearEntityEvent;
-import org.bukkit.event.vehicle.VehicleEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -37,12 +29,15 @@ public abstract class Game {
     protected final List<Entity> entities;
     protected final List<Cleanable<?>> cleanables;
 
+    private final List<PlayerTrigger> triggerQueue;
+
     private UUID uuid;
 
     protected Game() {
         this.players = new ArrayList<>();
         this.entities = new ArrayList<>();
         this.cleanables = new ArrayList<>();
+        this.triggerQueue = new ArrayList<>();
     }
 
     public State getState() {
@@ -137,6 +132,13 @@ public abstract class Game {
         return entities.toArray(new Entity[0]);
     }
 
+    public final void sendTrigger(PlayerProxy player, String trigger) {
+        if (trigger == null || !player.isTracked() || !player.getGame().equals(this))
+            return;
+
+        triggerQueue.add(new PlayerTrigger(player, trigger));
+    }
+
     /* ---- Game Loop ---- */
 
     /**
@@ -176,6 +178,13 @@ public abstract class Game {
         this.timer++;
         this.onTick();
         Bukkit.getPluginManager().callEvent(new GameTickEvent(this));
+
+        if (!triggerQueue.isEmpty()) {
+            for (var trigger : triggerQueue) {
+                Bukkit.getPluginManager().callEvent(new PlayerTriggerEvent(this, trigger.player, trigger.trigger));
+            }
+            triggerQueue.clear();
+        }
     }
 
     /**
@@ -194,7 +203,10 @@ public abstract class Game {
     void forceStop() {
         state = State.STOPPING;
 
-        this.onStop();
+        try {
+            this.onStop();
+        } catch (Exception ignored) {}
+
         Bukkit.getPluginManager().callEvent(new GameStopEvent(this));
 
         if (gameTask != null && !gameTask.isCancelled())
@@ -212,7 +224,9 @@ public abstract class Game {
         cleanables.forEach(Cleanable::clean);
         cleanables.clear();
 
-        this.onClean();
+        try {
+            this.onClean();
+        } catch (Exception ignored) {}
 
         GameCore.gameManager().onGameStopped(this);
     }
@@ -231,31 +245,12 @@ public abstract class Game {
         if (wasRunning)
             this.forceStop();
 
-        this.onReload();
+        try {
+            this.onReload();
+        } catch (Exception ignored) {}
 
         if (wasRunning)
             this.start();
-    }
-
-    /* ---- Event Checking ---- */
-
-    /**
-     * Helper method for event dispatching
-     */
-    public final boolean acceptsEvent(Event event) {
-        var manager = GameCore.gameManager();
-        return switch (event) {
-            case PlayerInteractEntityEvent e -> manager.isPlayerInGame(e.getPlayer()) || hasEntity(e.getRightClicked());
-            case PlayerShearEntityEvent e ->    manager.isPlayerInGame(e.getPlayer()) || hasEntity(e.getEntity());
-            case PlayerLeashEntityEvent e ->    manager.isPlayerInGame(e.getPlayer()) || hasEntity(e.getEntity());
-            case PlayerNameEntityEvent e ->     manager.isPlayerInGame(e.getPlayer()) || hasEntity(e.getEntity());
-            case PrePlayerAttackEntityEvent e -> manager.isPlayerInGame(e.getPlayer()) || hasEntity(e.getAttacked());
-            case PlayerEvent e ->               manager.isPlayerInGame(e.getPlayer());
-            case EntityDamageByEntityEvent e -> hasEntity(e.getEntity()) || hasEntity(e.getDamager());
-            case EntityEvent e ->               hasEntity(e.getEntity());
-            case VehicleEvent e ->              hasEntity(e.getVehicle());
-            default -> true;
-        };
     }
 
     /* ---- --------- ---- */
@@ -374,4 +369,6 @@ public abstract class Game {
     public String toString() {
         return getDisplayName();
     }
+
+    private record PlayerTrigger(PlayerProxy player, String trigger) {}
 }

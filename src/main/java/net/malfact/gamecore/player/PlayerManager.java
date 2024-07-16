@@ -104,7 +104,7 @@ public final class PlayerManager extends GameCoreManager implements Listener {
 
     @Override
     public void clean() {
-        GameCore.logger().info("Canceling " + cleaningTasks.size() + " Data-Clean Tasks");
+        GameCore.logger().info("Canceling {} Data-Clean Tasks", cleaningTasks.size());
         cleaningTasks.values().forEach(BukkitTask::cancel);
 
         players.values().forEach(this::cleanPlayer);
@@ -116,6 +116,9 @@ public final class PlayerManager extends GameCoreManager implements Listener {
     private void onPlayerSpawnLocation(@NotNull PlayerSpawnLocationEvent event) {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
+
+        if (GameCore.gameManager().isPlayerInGame(player))
+            return;
 
         QueuedPlayer gamePlayer;
         if (!players.containsKey(uuid)) {

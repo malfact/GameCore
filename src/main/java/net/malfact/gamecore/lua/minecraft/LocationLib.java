@@ -26,6 +26,7 @@ public class LocationLib implements LuaLib, TypeHandler<Location> {
         sharedLib.set("divide",     LuaUtil.toFunction(LocationLib::locationDivide));
         sharedLib.set("toHighest",  LuaUtil.toFunction(LocationLib::locationToHighest));
         sharedLib.set("length",     LuaUtil.toFunction(LocationLib::locationLength));
+        sharedLib.set("squareLength", LuaUtil.toFunction(LocationLib::locationSquareLength));
         sharedLib.set("toString",   LuaUtil.toFunction(LocationLib::locationToString));
     }
 
@@ -169,6 +170,11 @@ public class LocationLib implements LuaLib, TypeHandler<Location> {
     // Location::len(loc) -> double
     private static LuaValue locationLength(LuaValue arg) {
         return LuaValue.valueOf(LuaUtil.checkLocation(arg).length());
+    }
+
+    // Location::len(loc) -> double
+    private static LuaValue locationSquareLength(LuaValue arg) {
+        return LuaValue.valueOf(LuaUtil.checkLocation(arg).lengthSquared());
     }
 
 

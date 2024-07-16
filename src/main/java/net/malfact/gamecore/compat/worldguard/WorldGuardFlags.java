@@ -15,6 +15,7 @@ public final class WorldGuardFlags {
     static BooleanFlag JOIN_GAME;
     static BooleanFlag LEAVE_GAME;
     static BooleanFlag ALLOW_GAME_ONLY;
+    static StringFlag GAME_TRIGGER;
 
     private WorldGuardFlags(){}
 
@@ -25,13 +26,15 @@ public final class WorldGuardFlags {
             BooleanFlag joinFlag = new BooleanFlag("join-game-on-enter");
             BooleanFlag leaveFlag = new BooleanFlag("leave-game-on-exit");
             BooleanFlag allowFlag = new BooleanFlag("allow-game-only");
+            StringFlag triggerFlag = new StringFlag("game-trigger");
 
-            registry.registerAll(List.of(gameFlag, joinFlag, leaveFlag, allowFlag));
+            registry.registerAll(List.of(gameFlag, joinFlag, leaveFlag, allowFlag, triggerFlag));
 
             GAME_REGION = gameFlag;
             JOIN_GAME = joinFlag;
             LEAVE_GAME = leaveFlag;
             ALLOW_GAME_ONLY = allowFlag;
+            GAME_TRIGGER = triggerFlag;
 
         } catch (FlagConflictException e) {
             GameCore.logger().error(e.getMessage());

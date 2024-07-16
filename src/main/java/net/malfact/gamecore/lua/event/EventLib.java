@@ -107,7 +107,7 @@ public abstract class EventLib extends InstancedLib {
     private void registerListener(LuaValue arg1, LuaValue arg2) {
         if (instance instanceof ScriptedGame g) {
             var event = arg1.checkuserdata(EventRegistry.EventEntry.class);
-            event.registerListener(g.getFunctionCallback(arg2.checkfunction()));
+            event.registerListener(instance, g.getFunctionCallback(arg2.checkfunction()));
         }
     }
 

@@ -72,8 +72,13 @@ public class GameManager extends GameCoreManager implements Listener {
     }
 
     public boolean joinGame(Player player, Game game) {
-        if (players.containsKey(player.getUniqueId()))
-            return false;
+        if (players.containsKey(player.getUniqueId())) {
+            PlayerProxy proxy = players.get(player.getUniqueId());
+            if (proxy.getGame() != null && proxy.getGame().isRunning())
+                return false;
+            else
+                players.remove(player.getUniqueId());
+        }
 
         if (game.getState() != Game.State.RUNNING)
             return false;
@@ -89,12 +94,11 @@ public class GameManager extends GameCoreManager implements Listener {
     }
 
     public boolean leaveGame(Player player) {
-        PlayerProxy proxy = getPlayer(player.getUniqueId());
+        PlayerProxy proxy = getPlayerProxy(player.getUniqueId());
         if (!proxy.isTracked())
             return false;
 
         Bukkit.getPluginManager().callEvent(new PlayerLeaveGameEvent(proxy.getGame(), proxy));
-
         releasePlayer(player);
         return true;
     }
@@ -151,6 +155,25 @@ public class GameManager extends GameCoreManager implements Listener {
         return game.equals(players.get(uuid).getGame());
     }
 
+    /**
+     * Gets a PlayerProxy instance for a tracked player.
+     * @param player the tracked player
+     * @return the PlayerProxy instance, or an invalid instance.
+     */
+    public PlayerProxy getPlayerProxy(Player player) {
+        return getPlayerProxy(player.getUniqueId());
+    }
+
+    /**
+     * Gets a PlayerProxy instance for a tracked player.
+     * @param uuid the tracked player's uuid
+     * @return the PlayerProxy instance, or an invalid instance.
+     */
+    @NotNull
+    public PlayerProxy getPlayerProxy(UUID uuid) {
+        return players.getOrDefault(uuid, InvalidPlayerProxy.INSTANCE);
+    }
+
     void onGameStopped(Game game) {
         List<UUID> releases = new ArrayList<>();
         for (var player : players.values()) {
@@ -159,16 +182,6 @@ public class GameManager extends GameCoreManager implements Listener {
             }
         }
         players.entrySet().removeIf(entry -> releases.contains(entry.getKey()));
-    }
-
-    /**
-     * Gets a GamePlayer instance for a tracked player.
-     * @param uuid the tracked player's uuid
-     * @return the GamePlayer instance, or an invalid instance.
-     */
-    @NotNull
-    public PlayerProxy getPlayer(UUID uuid) {
-        return players.getOrDefault(uuid, InvalidPlayerProxy.INSTANCE);
     }
 
     @NotNull
@@ -207,7 +220,7 @@ public class GameManager extends GameCoreManager implements Listener {
     // Bukkit:PlayerJoinEvent to GameCore:PlayerSpawnEvent if the player is registered with a game.
     @EventHandler
     private void onPlayerJoined(@NotNull PlayerJoinEvent event) {
-        PlayerProxy proxy = getPlayer(event.getPlayer().getUniqueId());
+        PlayerProxy proxy = getPlayerProxy(event.getPlayer().getUniqueId());
         if (!proxy.isTracked())
             return;
 
@@ -218,7 +231,7 @@ public class GameManager extends GameCoreManager implements Listener {
     // Spigot:PlayerSpawnLocationEvent to GameCore:PlayerConnectEvent if the player is registered with a game.
     @EventHandler(priority = EventPriority.LOWEST)
     private void onPlayerSpawnLocation(@NotNull PlayerSpawnLocationEvent event) {
-        PlayerProxy proxy = getPlayer(event.getPlayer().getUniqueId());
+        PlayerProxy proxy = getPlayerProxy(event.getPlayer().getUniqueId());
         if (!proxy.isTracked())
             return;
 
@@ -233,7 +246,7 @@ public class GameManager extends GameCoreManager implements Listener {
     // Bukkit:PlayerQuitEvent to GameCore:PlayerDisconnectEvent if the player is registered with a game.
     @EventHandler(priority = EventPriority.LOWEST)
     private void onPlayerQuit(@NotNull PlayerQuitEvent event) {
-        PlayerProxy proxy = getPlayer(event.getPlayer().getUniqueId());
+        PlayerProxy proxy = getPlayerProxy(event.getPlayer().getUniqueId());
         if (!proxy.isTracked()) {
             return;
         }

@@ -28,7 +28,7 @@ public class HumanEntityHandler<T extends HumanEntity> extends LivingEntityHandl
     protected LuaValue get(Game instance, T entity, String key) {
         return switch (key) {
             // Get & Set
-            case "openInventory" ->         LuaApi.userdataOf(entity.getOpenInventory());
+            case "openInventory" ->         LuaApi.userdataOf(entity.getOpenInventory().getTopInventory());
             case "gamemode" ->              LuaApi.valueOf(entity.getGameMode().toString());
             case "exhaustion" ->            LuaApi.valueOf(entity.getExhaustion());
             case "saturation" ->            LuaApi.valueOf(entity.getSaturation());
