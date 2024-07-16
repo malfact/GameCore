@@ -1,1 +1,4 @@
 rootProject.name = 'GameCore'
+include 'gamecore-core'
+include 'gamecore-docs'
+
